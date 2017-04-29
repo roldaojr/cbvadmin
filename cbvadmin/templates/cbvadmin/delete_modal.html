@@ -1,0 +1,16 @@
+{% load i18n %}
+<div id="confirm-delete-modal" class="modal">
+  <form method="post" id="confirm-delete-form" action="{% url admin.urls.delete object.pk %}">
+    {% csrf_token %}
+    <div class="modal-content">
+      {% with object_name=view.admin.model_opts.verbose_name %}
+      <h4>{% block title %}{% trans 'Delete' %} {{ object_name }}{% endblock %}</h4>
+      {% blocktrans with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted.{% endblocktrans %}
+      {% endwith %}
+    </div>
+    <div class="modal-footer">
+      <a id="modal-confirm" href="#confirm-delete-form" class="modal-action form-submit btn-flat">{% trans 'Delete' %}</a>
+      <a id="modal-cancel" href="#" class="modal-action modal-close btn-flat">{% trans 'Cancel' %}</a>
+    </div>
+  </form>
+</div>

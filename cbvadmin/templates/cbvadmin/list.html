@@ -1,0 +1,29 @@
+{% extends 'cbvadmin/base_site.html' %}
+{% load i18n %}
+
+{% block title %}{{ view.admin.model_opts.verbose_name_plural|capfirst }}{% endblock %}
+
+{% block actions %}
+<ul id="nav-mobile" class="right">
+    {% if view.has_filters and filter.form %}
+    <li>
+        <a class="hide-on-large-only right-sidenav" href="#" data-activates="filter-slide-out"><i class="material-icons">filter_list</i></a>
+        <a class="hide-on-med-and-down right-sidenav show-on-large" href="#" data-activates="filter-slide-out"><i class="left material-icons">filter_list</i>{% trans 'Filter' %}</a>
+    </li>
+    {% endif %}
+    <li class="hide-on-med-and-down">
+        <a href="{% url admin.urls.add %}"><i class="left material-icons">add</i> {% trans 'Add' %} {{ view.admin.model_opts.verbose_name }}</a>
+    </li>
+</ul>
+<div class="fixed-action-btn hide-on-large-only">
+    <a class="btn-floating btn-large blue darken-4" href="{% url admin.urls.add %}">
+        <i class="large material-icons">add</i>
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% load render_table from django_tables2 %}
+{% render_table table %}
+{% include 'cbvadmin/filter.html' %}
+{% endblock %}

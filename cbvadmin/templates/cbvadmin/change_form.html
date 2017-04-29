@@ -1,0 +1,44 @@
+{% extends 'cbvadmin/base_site.html' %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block extrascript %}
+{{ form.media.js }}
+{% endblock %}
+
+{% block title %}
+{% if object %}{% trans 'Change' %}{% else %}{% trans 'Add' %}{% endif %}
+{% filter capfirst %}{{ admin.model_opts.verbose_name }}{% endfilter %}
+{% endblock %}
+
+{% block actions %}
+<ul id="nav-mobile" class="right">
+{% if object %}
+  <li class="hide-on-med-and-down"><a class="modal-trigger" href="#confirm-delete-modal"><i class="left material-icons">delete</i>{% trans 'Delete' %}</a></li>
+{% endif %}
+  <li class="hide-on-med-and-down"><a class="form-submit" href="#change_form"><i class="left material-icons">save</i>{% trans 'Save' %}</a></li>
+  <li class="hide-on-large-only"><a class="form-submit" href="#change_form"><i class="material-icons">save</i></a></li>
+</ul>
+{% endblock %}
+
+
+{% block content %}
+{% load crispy_forms_tags %}
+{% crispy form %}
+{% comment %}
+<form method="post" id="change_form" enctype="multipart/form-data">{% csrf_token %}
+<div class="red white-text">
+{{ form.non_field_errors.as_text }}
+</div>
+<div class="row">
+{% for field in form %}
+  {{ field|as_material:'s12 m6' }}
+{% endfor %}
+</div>
+</form>
+{% endcomment %}
+{% if object %}{% include 'cbvadmin/delete_modal.html' %}{% endif %}
+{% endblock %}

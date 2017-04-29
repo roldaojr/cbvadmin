@@ -1,0 +1,18 @@
+{% if form_show_errors %}
+    {% include "materialize_css_forms/errors.html" %}
+{% endif %}
+
+{% if form_style %}
+    <fieldset class="{{ form_style }}">
+        <legend></legend>
+{% endif %}
+
+{% for field in form %}
+        <div class="row">
+            {% include "materialize_css_forms/field.html" %}
+        </div>
+{% endfor %}
+
+{% if form_style %}
+    </fieldset>
+{% endif %}
