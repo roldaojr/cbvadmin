@@ -1,0 +1,36 @@
+/* Convert table to on small screens */
+@media only screen and (max-width: 993px) {
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    tr {
+        min-height: 40px;
+    }
+    td:not(.checkbox):before {
+        display: inline-block;
+        padding-top: 3px;
+        width: auto;
+        padding-right: 5px;
+        line-height: 1;
+        content: attr(data-header);
+        font-weight: bold;
+    }
+    td:not(.checkbox) {
+        /* Behave  like a "row" */
+        margin-left: 15px;
+        border: none;
+        padding: 3px 5px;
+        width: calc(100% - 15px);
+    }
+    .checkbox {
+        float: left;
+        margin-left: 10px;
+    }
+}
