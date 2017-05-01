@@ -1,4 +1,4 @@
-{% extends 'cbvadmin/base.html' %}
+{% extends 'cbvadmin/materialize/base.html' %}
 {% load static menu %}
 {% block outer_content %}
 
@@ -28,7 +28,7 @@
         </ul>
     </li>
 {% with menu=menus.cbvadmin %}
-{% include 'cbvadmin/side-menu.html' %}
+{% include 'cbvadmin/materialize/side-menu.html' %}
 {% endwith %}
 </ul>
 {% endblock %}

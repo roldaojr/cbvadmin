@@ -7,6 +7,7 @@ from django_filters import CharFilter
 from django_filters.filterset import FilterSet
 from django_filters.views import FilterMixin
 from crispy_forms.helper import FormHelper
+from ..utils import get_setting
 
 
 __all__ = ('ViewMixin', 'FormMixin', 'FilterMixin', 'SuccessUrlMixin')
@@ -40,6 +41,12 @@ class ViewMixin(object):
         if self.admin and hasattr(self.admin, 'get_context_data'):
             context['admin'] = self.admin.get_context_data()
         return context
+
+    def get_template_names(self, *args, **kwargs):
+        template_names = super(ViewMixin, self).get_template_names(
+            *args, **kwargs)
+        theme = get_setting('theme', 'materialize')
+        return map(lambda t: 'cbvadmin/%s/%s' % (theme, t), template_names)
 
 
 class SuccessMessageMixin(SuccessMessageMixin_):

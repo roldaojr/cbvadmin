@@ -4,7 +4,7 @@ from .mixins import ViewMixin
 
 class Dashboard(ViewMixin, TemplateView):
     admin = None
-    template_name = 'cbvadmin/dashboard.html'
+    template_name = 'dashboard.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(Dashboard, self).get_context_data(*args, **kwargs)

@@ -3,7 +3,7 @@ from .mixins import ViewMixin, FilterMixin
 
 
 class TableListView(ViewMixin, FilterMixin, SingleTableView):
-    template_name = 'cbvadmin/list.html'
+    template_name = 'list.html'
 
     def get_table_class(self):
         if not self.table_class:

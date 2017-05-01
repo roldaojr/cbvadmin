@@ -1,4 +1,4 @@
-{% extends 'cbvadmin/base_site.html' %}
+{% extends 'cbvadmin/materialize/base_site.html' %}
 {% load i18n %}
 
 {% block extrastyle %}
@@ -40,5 +40,5 @@
 </div>
 </form>
 {% endcomment %}
-{% if object %}{% include 'cbvadmin/delete_modal.html' %}{% endif %}
+{% if object %}{% include 'cbvadmin/materialize/delete_modal.html' %}{% endif %}
 {% endblock %}

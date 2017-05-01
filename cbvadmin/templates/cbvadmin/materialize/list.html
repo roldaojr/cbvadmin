@@ -1,4 +1,4 @@
-{% extends 'cbvadmin/base_site.html' %}
+{% extends 'cbvadmin/materialize/base_site.html' %}
 {% load i18n %}
 
 {% block title %}{{ view.admin.model_opts.verbose_name_plural|capfirst }}{% endblock %}
@@ -24,6 +24,6 @@
 
 {% block content %}
 {% load render_table from django_tables2 %}
-{% render_table table %}
-{% include 'cbvadmin/filter.html' %}
+{% render_table table 'cbvadmin/materialize/table.html' %}
+{% include 'cbvadmin/materialize/filter.html' %}
 {% endblock %}
