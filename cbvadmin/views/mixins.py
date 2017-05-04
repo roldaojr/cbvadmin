@@ -112,12 +112,6 @@ class LoginRequiredMixin(AccessMixin):
 class ViewMixin(LoginRequiredMixin):
     admin = None
 
-    def get_context_data(self, **kwargs):
-        context = super(ViewMixin, self).get_context_data(**kwargs)
-        if self.admin and hasattr(self.admin, 'get_context_data'):
-            context['admin'] = self.admin.get_context_data()
-        return context
-
     def get_template_names(self, *args, **kwargs):
         template_names = super(ViewMixin, self).get_template_names(
             *args, **kwargs)

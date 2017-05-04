@@ -11,7 +11,7 @@
 
 {% block title %}
 {% if object %}{% trans 'Change' %}{% else %}{% trans 'Add' %}{% endif %}
-{% filter capfirst %}{{ admin.model_opts.verbose_name }}{% endfilter %}
+{% filter capfirst %}{{ view.admin.model_opts.verbose_name }}{% endfilter %}
 {% endblock %}
 
 {% block actions %}

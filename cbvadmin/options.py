@@ -1,5 +1,7 @@
+from collections import namedtuple
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
+from django.utils.functional import cached_property
 from django_tables2 import tables
 from django_tables2.utils import A
 from menu import MenuItem
@@ -29,15 +31,19 @@ class BaseAdmin(object):
                 setattr(self, key, kwargs[key])
 
 
+AdminAction = namedtuple('AdminAction', ['name', 'target', 'default'])
+
+
 class ModelAdmin(BaseAdmin):
     default_action = 'list'
+    default_object_action = 'edit'
     # list related options
     list_display = None
     list_display_links = None
     list_view_class = ListView
     filterset_class = None
     filter_fields = None
-    # Edit related options
+    # Add/Edit/Delte options
     add_view_class = AddView
     edit_view_class = EditView
     delete_view_class = DeleteView
@@ -51,8 +57,8 @@ class ModelAdmin(BaseAdmin):
         return True
 
     def get_view_class(self, action):
-        view_class = getattr(self, '%s_view_class' % action)
-        if not hasattr(view_class, 'admin'):
+        view_class = getattr(self, '%s_view_class' % action, None)
+        if view_class and not hasattr(view_class, 'admin'):
             view_class.admin = None
         return view_class
 
@@ -63,45 +69,49 @@ class ModelAdmin(BaseAdmin):
         """Return the form class to use."""
         return self.form_class
 
+    def get_actions(self):
+        return [
+            AdminAction('edit', 'object', True),
+            AdminAction('delete', 'object', False),
+            AdminAction('list', 'collection', True),
+            AdminAction('add', 'collection', False)
+        ]
+
     def get_urls(self):
         app = self.model_class._meta.app_label
         model = self.model_class._meta.model_name
-        view_kwargs = {
-            'model': self.model_class,
-            'admin': self
-        }
-        object_actions = ('edit', 'delete')
-        collection_actions = ('list', 'add')
+        view_kwargs = {'model': self.model_class, 'admin': self}
         urls = []
-        for i, action in enumerate(collection_actions):
-            pattern = r'^%s$' % action if i > 0 else r'^$'
-            urls.append(url(pattern,
-                        self.get_view_class(action).as_view(**view_kwargs),
-                        name='%s_%s_%s' % (app, model, action)))
-        for i, action in enumerate(object_actions):
-            pattern = '/%s' % action if i > 0 else ''
-            urls.append(url(r'^(?P<pk>\d+)%s$' % pattern,
-                            self.get_view_class(action).as_view(**view_kwargs),
-                            name='%s_%s_%s' % (app, model, action)))
+        # get valid actions
+        actions = self.get_actions()
 
+        for action in actions:
+            if action.name == self.default_action:
+                pattern = r'^$'
+            elif action.name == self.default_object_action:
+                pattern = r'^(?P<pk>\d+)/$'
+            elif action.target == 'object':
+                pattern = r'^(?P<pk>\d+)/%s$' % action.name
+            else:
+                pattern = r'^%s$' % action.name
+
+            view_class = self.get_view_class(action.name)
+            urls.append(url(pattern, view_class.as_view(**view_kwargs),
+                            name='%s_%s_%s' % (app, model, action.name)))
         return urls
 
-    def get_context_data(self):
-        model_name = (self.model_class._meta.app_label,
-                      self.model_class._meta.model_name)
-        return {
-            'model_opts': self.model_class._meta,
-            'urls': {
-                'list': 'cbvadmin:%s_%s_list' % model_name,
-                'add': 'cbvadmin:%s_%s_add' % model_name,
-                'edit': 'cbvadmin:%s_%s_edit' % model_name,
-                'delete': 'cbvadmin:%s_%s_delete' % model_name,
-            }
-        }
+    @cached_property
+    def urls(self):
+        app = self.model_class._meta.app_label
+        model = self.model_class._meta.model_name
+        urls = {a.name: 'cbvadmin:%s_%s_%s' % (app, model, a.name)
+                for a in self.get_actions()}
+        urls['default'] = 'cbvadmin:%s_%s_%s' % (
+            app, model, self.default_action)
+        urls['default_object'] = 'cbvadmin:%s_%s_%s' % (
+            app, model, self.default_object_action)
+        return urls
 
     def get_menu_item(self):
-        view_name = 'cbvadmin:%s_%s_%s' % (self.model_class._meta.app_label,
-                                           self.model_class._meta.model_name,
-                                           self.default_action)
         return MenuItem(self.model_class._meta.verbose_name.title(),
-                        reverse(view_name))
+                        reverse(self.urls['default']))

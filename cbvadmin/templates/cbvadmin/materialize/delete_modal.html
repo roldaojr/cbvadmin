@@ -1,6 +1,6 @@
 {% load i18n %}
 <div id="confirm-delete-modal" class="modal">
-  <form method="post" id="confirm-delete-form" action="{% url admin.urls.delete object.pk %}">
+  <form method="post" id="confirm-delete-form" action="{% url view.admin.urls.delete object.pk %}">
     {% csrf_token %}
     <div class="modal-content">
       {% with object_name=view.admin.model_opts.verbose_name %}
