@@ -24,21 +24,8 @@
 </ul>
 {% endblock %}
 
-
 {% block content %}
 {% load crispy_forms_tags %}
 {% crispy form %}
-{% comment %}
-<form method="post" id="change_form" enctype="multipart/form-data">{% csrf_token %}
-<div class="red white-text">
-{{ form.non_field_errors.as_text }}
-</div>
-<div class="row">
-{% for field in form %}
-  {{ field|as_material:'s12 m6' }}
-{% endfor %}
-</div>
-</form>
-{% endcomment %}
 {% if object %}{% include 'cbvadmin/materialize/delete_modal.html' %}{% endif %}
 {% endblock %}
