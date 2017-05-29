@@ -11,6 +11,9 @@
         <a class="hide-on-med-and-down right-sidenav show-on-large" href="#" data-activates="filter-slide-out"><i class="left material-icons">filter_list</i>{% trans 'Filter' %}</a>
     </li>
     {% endif %}
+    <li class="hide-on-large-only">
+        <a class="right-sidenav" href="#" data-activates="sort-slide-out"><i class="material-icons">sort</i></a>
+    </li>
     <li class="hide-on-med-and-down">
         <a href="{% url view.admin.urls.add %}"><i class="left material-icons">add</i> {% trans 'Add' %} {{ view.admin.model_opts.verbose_name }}</a>
     </li>
@@ -26,4 +29,29 @@
 {% load render_table from django_tables2 %}
 {% render_table table 'cbvadmin/materialize/table.html' %}
 {% include 'cbvadmin/materialize/filter.html' %}
+{% include 'cbvadmin/materialize/sort.html' %}
+{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+.table-container th.asc:after {
+    content: '\0000a0\0025b2';
+    float: right;
+}
+.table-container th.desc:after {
+    content: '\0000a0\0025bc';
+    float: right;
+}
+#sort-slide-out li.active {
+    background-color: inherit;
+}
+#sort-slide-out li.asc a:after {
+    content: '\0000a0\0025b2';
+    float: right;
+}
+#sort-slide-out li.desc a:after {
+    content: '\0000a0\0025bc';
+    float: right;
+}
+</style>
 {% endblock %}

@@ -1,0 +1,13 @@
+{% load django_tables2 i18n %}
+{% block sort %}
+<ul id="sort-slide-out" class="side-nav">
+    <li class="logo white-text blue darken-4 center-align">
+        {% trans 'Sort' %}
+    </li>
+{% for column in table.columns %}
+{% if column.orderable %}
+    <li {{ column.attrs.th.as_html }}><a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ column.header }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
+{% endblock %}
