@@ -7,3 +7,5 @@ _private/
 media/
 staticfiles/
 .env
+build/
+dist/
