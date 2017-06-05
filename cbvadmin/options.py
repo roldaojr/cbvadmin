@@ -115,3 +115,6 @@ class ModelAdmin(BaseAdmin):
     def get_menu_item(self):
         return MenuItem(self.model_class._meta.verbose_name.title(),
                         reverse(self.urls['default']))
+
+    def get_success_url(self):
+        return reverse(self.urls['default'])

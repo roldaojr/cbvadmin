@@ -186,6 +186,4 @@ class FilterMixin(FilterMixin):
 
 class SuccessUrlMixin(object):
     def get_success_url(self):
-        model_name = (self.model._meta.app_label,
-                      self.model._meta.object_name.lower())
-        return reverse('cbvadmin:%s_%s_list' % model_name)
+        return self.admin.get_success_url()
