@@ -14,15 +14,19 @@
     <li class="hide-on-large-only">
         <a class="right-sidenav" href="#" data-activates="sort-slide-out"><i class="material-icons">sort</i></a>
     </li>
+    {% if view.admin.urls.add %}
     <li class="hide-on-med-and-down">
         <a href="{% url view.admin.urls.add %}"><i class="left material-icons">add</i> {% trans 'Add' %} {{ view.admin.model_opts.verbose_name }}</a>
     </li>
+    {% endif %}
 </ul>
+{% if view.admin.urls.add %}
 <div class="fixed-action-btn hide-on-large-only">
     <a class="btn-floating btn-large blue darken-4" href="{% url view.admin.urls.add %}">
         <i class="large material-icons">add</i>
     </a>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
