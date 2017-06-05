@@ -42,7 +42,9 @@ class AdminSite(object):
             app_title = apps.get_app_config(app_label).verbose_name
             if app_title not in admin_sub_menus:
                 admin_sub_menus[app_title] = []
-            admin_sub_menus[app_title] += [admin.get_menu_item()]
+            menu_item = admin.get_menu_item()
+            if menu_item:
+                admin_sub_menus[app_title] += [menu_item]
         for label, items in sorted(six.iteritems(admin_sub_menus)):
             admin_menu.append(MenuItem(label, '', children=items))
         return admin_menu
