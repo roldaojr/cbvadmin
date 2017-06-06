@@ -115,7 +115,7 @@ class ModelAdmin(BaseAdmin):
         return urls
 
     def get_menu(self):
-        return [MenuItem(self.model_class._meta.verbose_name.title(),
+        return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
                          reverse(self.urls['default']),
                          weight=self.menu_weight)]
 
