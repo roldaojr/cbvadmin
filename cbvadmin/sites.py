@@ -4,6 +4,7 @@ from collections import defaultdict
 from django.conf.urls import url, include
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.urlresolvers import reverse
+from django.utils.functional import cached_property
 from menu import MenuItem
 from .options import BaseAdmin
 from .views.dashboard import Dashboard
@@ -71,6 +72,10 @@ class AdminSite(object):
     def logout(self, request):
         from django.contrib.auth.views import logout_then_login
         return logout_then_login(request, login_url=reverse('cbvadmin:login'))
+
+    @cached_property
+    def theme_colors(self):
+        return get_setting('theme_colors', 'blue darken-4 white-text')
 
 
 site = AdminSite()

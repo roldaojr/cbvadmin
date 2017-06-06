@@ -6,13 +6,13 @@
 {% generate_menu %}
 <!-- side nav -->
 <ul id="nav-menu" class="side-nav fixed">
-    <li class="logo white-text blue darken-4 center-align">
+    <li class="logo {{ view.admin.site.theme_colors }} center-align">
     	{% block admin_name %}{{ view.admin.site.title }}{% endblock %}
 	</li>
     <li class="no-padding">
         <ul class="collapsible collapsible-accordion">
             <li>
-                <a class="collapsible-header blue darken-4 white-text">
+                <a class="collapsible-header {{ view.admin.site.theme_colors }}">
                     <i class="material-icons">account_circle</i>{{ request.user }}
                     <i class="material-icons right">arrow_drop_down</i>
                 </a>
@@ -35,7 +35,7 @@
 
 <div class="navbar-fixed">
     <nav>
-        <div class="nav-wrapper blue darken-4 main-content">
+        <div class="nav-wrapper {{ view.admin.site.theme_colors }} main-content">
             <span class="brand-logo">{% block title %}{% endblock %}</span>
       		<a href="#" data-activates="nav-menu" class="button-collapse"><i class="material-icons">menu</i></a>
             {% block actions %}{% endblock %}

@@ -22,7 +22,7 @@
 </ul>
 {% if view.admin.urls.add %}
 <div class="fixed-action-btn hide-on-large-only">
-    <a class="btn-floating btn-large blue darken-4" href="{% url view.admin.urls.add %}">
+    <a class="btn-floating btn-large {{ view.admin.site.theme_colors }}" href="{% url view.admin.urls.add %}">
         <i class="large material-icons">add</i>
     </a>
 </div>
