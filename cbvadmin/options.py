@@ -49,7 +49,7 @@ class ModelAdmin(BaseAdmin):
     delete_view_class = DeleteView
     form_class = None
     # menu item optionns
-    menu_item_weight = 10
+    menu_weight = 50
 
     def __init__(self, model_class):
         self.model_class = model_class
@@ -114,10 +114,10 @@ class ModelAdmin(BaseAdmin):
             app, model, self.default_object_action)
         return urls
 
-    def get_menu_item(self):
-        return MenuItem(self.model_class._meta.verbose_name.title(),
-                        reverse(self.urls['default']),
-                        weight=self.menu_item_weight)
+    def get_menu(self):
+        return [MenuItem(self.model_class._meta.verbose_name.title(),
+                         reverse(self.urls['default']),
+                         weight=self.menu_weight)]
 
     def get_success_url(self):
         return reverse(self.urls['default'])

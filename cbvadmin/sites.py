@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 import six
-from django.apps import apps
+from collections import defaultdict
 from django.conf.urls import url, include
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.urlresolvers import reverse
 from menu import MenuItem
 from .options import BaseAdmin
 from .views.dashboard import Dashboard
-from .utils import get_setting
+from .utils import get_setting, sub_menu_generator
 
 
 class AdminSite(object):
@@ -15,11 +15,15 @@ class AdminSite(object):
     name = 'cbvadmin'
     title = 'CBVAdmin'
     login_form = None
+    _menu_registry = defaultdict(lambda: sub_menu_generator)
 
     def register(self, model_class, admin_class):
         admin = admin_class(model_class)
         admin.site = self
         self._registry[model_class] = admin
+
+    def register_menu(self, app_label, menu_func):
+        self._menu_registry[app_label] = menu_func
 
     def get_urls(self):
         dashboard_view = Dashboard.as_view(admin=BaseAdmin(site=self))
@@ -36,17 +40,14 @@ class AdminSite(object):
 
     def get_menu(self):
         admin_menu = [MenuItem('Dashboard', reverse('cbvadmin:dashboard'))]
-        admin_sub_menus = {}
+        admin_sub_menus = defaultdict(lambda: [])
         for model, admin in self._registry.iteritems():
             app_label = model._meta.app_label
-            app_title = apps.get_app_config(app_label).verbose_name
-            if app_title not in admin_sub_menus:
-                admin_sub_menus[app_title] = []
-            menu_item = admin.get_menu_item()
-            if menu_item:
-                admin_sub_menus[app_title] += [menu_item]
+            sub_menu = admin.get_menu()
+            if sub_menu:
+                admin_sub_menus[app_label] += tuple(sub_menu)
         for label, items in sorted(six.iteritems(admin_sub_menus)):
-            admin_menu.append(MenuItem(label, '', children=items))
+            admin_menu += self._menu_registry[label](label, items)
         return admin_menu
 
     @property
