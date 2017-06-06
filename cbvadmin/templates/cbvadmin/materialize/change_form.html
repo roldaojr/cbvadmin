@@ -16,7 +16,7 @@
 
 {% block actions %}
 <ul id="nav-mobile" class="right">
-{% if object %}
+{% if object and view.admin.urls.delete %}
   <li class="hide-on-med-and-down"><a class="modal-trigger" href="#confirm-delete-modal"><i class="left material-icons">delete</i>{% trans 'Delete' %}</a></li>
 {% endif %}
   <li class="hide-on-med-and-down"><a class="form-submit" href="#change_form"><i class="left material-icons">save</i>{% trans 'Save' %}</a></li>
@@ -27,5 +27,5 @@
 {% block content %}
 {% load crispy_forms_tags %}
 {% crispy form %}
-{% if object %}{% include 'cbvadmin/materialize/delete_modal.html' %}{% endif %}
+{% if object and view.admin.urls.delete %}{% include 'cbvadmin/materialize/delete_modal.html' %}{% endif %}
 {% endblock %}
