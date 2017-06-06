@@ -132,6 +132,8 @@ class SuccessMessageMixin(SuccessMessageMixin_):
 
 
 class FormMixin(object):
+    form_id = 'change_form'
+
     def get_form_class(self):
         form_class = self.admin.get_form_class(self.request, self.object)
         if form_class is None:
@@ -142,7 +144,7 @@ class FormMixin(object):
         form = super(FormMixin, self).get_form(form_class)
         if not hasattr(form, 'helper'):
             form.helper = FormHelper()
-        form.helper.form_id = 'change_form'
+        form.helper.form_id = self.form_id
         return form
 
 
