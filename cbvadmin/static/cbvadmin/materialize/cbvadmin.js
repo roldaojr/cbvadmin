@@ -9,7 +9,7 @@ $(document).ready(function(){
             $(this.$node).removeClass('invalid').addClass('valid')
         }
     })
-    $('.datepicker').pickadate()
+    $('.dateinput').pickadate()
     $('.button-collapse').sideNav()
     $('.right-sidenav').sideNav({edge: 'right', menuWidth: 300})
     $('select').not('.django-select2').material_select()
