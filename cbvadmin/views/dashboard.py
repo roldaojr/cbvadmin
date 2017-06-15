@@ -1,8 +1,8 @@
 from django.views.generic import TemplateView
-from .mixins import ViewMixin
+from .mixins import AdminTemplateMixin
 
 
-class Dashboard(ViewMixin, TemplateView):
+class Dashboard(AdminTemplateMixin, TemplateView):
     admin = None
     template_name = 'dashboard.html'
 

@@ -14,7 +14,9 @@ from crispy_forms.helper import FormHelper
 from ..utils import get_setting
 
 
-__all__ = ('ViewMixin', 'FormMixin', 'FilterMixin', 'SuccessUrlMixin')
+__all__ = ('AccessMixin', 'LoginRequiredMixin', 'AdminTemplateMixin',
+           'SuccessMessageMixin', 'SuccessUrlMixin', 'FormMixin',
+           'FilterMixin')
 
 
 filter_overrides = {
@@ -109,11 +111,9 @@ class LoginRequiredMixin(AccessMixin):
             request, *args, **kwargs)
 
 
-class ViewMixin(LoginRequiredMixin):
-    admin = None
-
+class AdminTemplateMixin(object):
     def get_template_names(self, *args, **kwargs):
-        template_names = super(ViewMixin, self).get_template_names(
+        template_names = super(AdminTemplateMixin, self).get_template_names(
             *args, **kwargs)
         theme = get_setting('theme', 'materialize')
         return map(lambda t: 'cbvadmin/%s/%s' % (theme, t), template_names)
