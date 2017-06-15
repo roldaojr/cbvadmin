@@ -1,4 +1,4 @@
-from collections import namedtuple
+import six
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.utils.functional import cached_property
@@ -29,9 +29,6 @@ class BaseAdmin(object):
         for key in kwargs:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-
-
-AdminAction = namedtuple('AdminAction', ['name', 'target', 'default'])
 
 
 class ModelAdmin(BaseAdmin):
@@ -72,12 +69,12 @@ class ModelAdmin(BaseAdmin):
         return self.form_class
 
     def get_actions(self):
-        return [
-            AdminAction('edit', 'object', True),
-            AdminAction('delete', 'object', False),
-            AdminAction('list', 'collection', True),
-            AdminAction('add', 'collection', False)
-        ]
+        return {
+            'edit': 'object',
+            'delete': 'object',
+            'list': 'collection',
+            'add': 'collection'
+        }
 
     def get_urls(self):
         app = self.model_class._meta.app_label
@@ -87,27 +84,27 @@ class ModelAdmin(BaseAdmin):
         # get valid actions
         actions = self.get_actions()
 
-        for action in actions:
-            if action.name == self.default_action:
+        for action, target in six.iteritems(actions):
+            if action == self.default_action:
                 pattern = r'^$'
-            elif action.name == self.default_object_action:
+            elif action == self.default_object_action:
                 pattern = r'^(?P<pk>\d+)/$'
-            elif action.target == 'object':
-                pattern = r'^(?P<pk>\d+)/%s$' % action.name
+            elif target == 'object':
+                pattern = r'^(?P<pk>\d+)/%s$' % action
             else:
-                pattern = r'^%s$' % action.name
+                pattern = r'^%s$' % action
 
-            view_class = self.get_view_class(action.name)
+            view_class = self.get_view_class(action)
             urls.append(url(pattern, view_class.as_view(**view_kwargs),
-                            name='%s_%s_%s' % (app, model, action.name)))
+                            name='%s_%s_%s' % (app, model, action)))
         return urls
 
     @cached_property
     def urls(self):
         app = self.model_class._meta.app_label
         model = self.model_class._meta.model_name
-        urls = {a.name: 'cbvadmin:%s_%s_%s' % (app, model, a.name)
-                for a in self.get_actions()}
+        urls = {a: 'cbvadmin:%s_%s_%s' % (app, model, a)
+                for a, t in six.iteritems(self.get_actions())}
         urls['default'] = 'cbvadmin:%s_%s_%s' % (
             app, model, self.default_action)
         urls['default_object'] = 'cbvadmin:%s_%s_%s' % (
