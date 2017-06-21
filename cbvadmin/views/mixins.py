@@ -113,10 +113,14 @@ class LoginRequiredMixin(AccessMixin):
 
 class AdminTemplateMixin(object):
     def get_template_names(self, *args, **kwargs):
-        template_names = super(AdminTemplateMixin, self).get_template_names(
-            *args, **kwargs)
+        template_names = super(
+            AdminTemplateMixin, self).get_template_names(*args, **kwargs)
         theme = get_setting('theme', 'materialize')
-        return map(lambda t: 'cbvadmin/%s/%s' % (theme, t), template_names)
+        admin_templates = map(lambda t: 'cbvadmin/%s' % t,
+                              reversed(template_names))
+        theme_templates = map(lambda t: 'cbvadmin/%s/%s' % (theme, t),
+                              reversed(template_names))
+        return admin_templates + theme_templates
 
 
 class SuccessMessageMixin(SuccessMessageMixin_):
