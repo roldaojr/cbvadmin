@@ -14,6 +14,5 @@ setup(
         'django-filter>=1.0',
         'django-simple-menu>=1.2',
         'django-tables2>=1.5'
-    ],
-    zip_safe=False
+    ]
 )
