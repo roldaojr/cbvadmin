@@ -115,6 +115,9 @@ class AdminTemplateMixin(object):
     def get_template_names(self, *args, **kwargs):
         template_names = super(
             AdminTemplateMixin, self).get_template_names(*args, **kwargs)
+        default_template = getattr(self, 'default_template', None)
+        if default_template:
+            template_names.append(default_template)
         theme = get_setting('theme', 'materialize')
         admin_templates = map(lambda t: 'cbvadmin/%s' % t,
                               reversed(template_names))
