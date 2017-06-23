@@ -56,7 +56,7 @@ class ModelAdmin(BaseAdmin):
         return True
 
     def get_view_class(self, action):
-        view_class = getattr(self, '%s_view_class' % action, None)
+        view_class = getattr(self, '%s_view_class' % action)
         if view_class and not hasattr(view_class, 'admin'):
             view_class.admin = None
         return view_class
