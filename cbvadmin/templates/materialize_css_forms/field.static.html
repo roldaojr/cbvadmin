@@ -1,0 +1,9 @@
+<div id="div_{{ field.auto_id }}" class="{% if wrapper_class %} {{ wrapper_class }}{% endif %}">
+{% if field.label and form_show_labels %}
+<label for="{{ field.auto_id }}">{{ field.label }}</label>
+{% endif %}
+{% if field.form %}
+<input type="hidden" name="{% if field.form.prefix %}{{ field.form.prefix }}-{% endif %}{{ field.name }}" id="{{ field.auto_id }}" value="{{ field.value|safe }}">
+{% endif %}
+<div {{ flat_attrs|safe }}>{{ field.text }}</div>
+</div>
