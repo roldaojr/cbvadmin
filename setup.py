@@ -1,8 +1,9 @@
 from setuptools import setup
+import cbvadmin
 
 setup(
     name='CBVadmin',
-    version='0.1.0-dev',
+    version=cbvadmin.__version__,
     description='Drop-in replacement of Django admin using Class Based Views',
     author='roldaojr',
     author_email='roldaogjr@gmail.com',
