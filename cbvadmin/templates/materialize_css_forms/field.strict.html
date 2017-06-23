@@ -3,19 +3,21 @@
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
-    <div id="div_{{ field.auto_id }}" class="holder{% if field.errors %} error{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.field.widget.attrs.class %} {{ field.field.widget.attrs.class }}{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
+    <div id="div_{{ field.auto_id }}" class="holder{% if field.errors %} error{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.field.widget.attrs.class %} {{ field.field.widget.attrs.class }}{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}">
 
         {% if field|is_checkbox %}
             {% crispy_field field %}
-        {% endif %}
-
-        {% if field.label %}
+            <label for="{{ field.id_for_label }}" class="inline-label">
+            {% if field.label and form_show_labels %}
+                {{ field.label|safe }}{% if field.field.required %}<em>*</em>{% endif %}
+            {% endif %}
+            </label>
+        {% else %}
+            {% if field.label and form_show_labels %}
             <label for="{{ field.id_for_label }}" class="inline-label">
                 {{ field.label|safe }}{% if field.field.required %}<em>*</em>{% endif %}
             </label>
-        {% endif %}
-
-        {% if not field|is_checkbox %}
+            {% endif %}
             {% crispy_field field %}
         {% endif %}
 
