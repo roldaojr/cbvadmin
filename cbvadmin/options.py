@@ -103,5 +103,5 @@ class ModelAdmin(BaseAdmin):
                          reverse(self.urls['default']),
                          weight=self.menu_weight)]
 
-    def get_success_url(self):
+    def get_success_url(self, view):
         return reverse(self.urls['default'])

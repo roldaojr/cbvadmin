@@ -136,7 +136,7 @@ class SuccessMixin(SuccessMessageMixin):
             return 'Success'
 
     def get_success_url(self):
-        return self.admin.get_success_url()
+        return self.admin.get_success_url(view=self)
 
 
 class FormMixin(SuccessMixin):
