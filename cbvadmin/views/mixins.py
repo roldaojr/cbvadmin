@@ -2,8 +2,7 @@ import inspect
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.messages.views import (
-    SuccessMessageMixin as SuccessMessageMixin_)
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import (HttpResponse, StreamingHttpResponse)
 from django.utils.functional import cached_property
@@ -15,8 +14,7 @@ from ..utils import get_setting
 
 
 __all__ = ('AccessMixin', 'LoginRequiredMixin', 'AdminTemplateMixin',
-           'SuccessMessageMixin', 'SuccessUrlMixin', 'FormMixin',
-           'FilterMixin')
+           'SuccessMixin', 'FormMixin', 'FilterMixin')
 
 
 filter_overrides = {
@@ -126,7 +124,7 @@ class AdminTemplateMixin(object):
         return admin_templates + theme_templates
 
 
-class SuccessMessageMixin(SuccessMessageMixin_):
+class SuccessMixin(SuccessMessageMixin):
     success_message = None
 
     def get_success_message(self, cleaned_data):
@@ -137,8 +135,11 @@ class SuccessMessageMixin(SuccessMessageMixin_):
         else:
             return 'Success'
 
+    def get_success_url(self):
+        return self.admin.get_success_url()
 
-class FormMixin(object):
+
+class FormMixin(SuccessMixin):
     form_id = 'change_form'
 
     def get_form_class(self):
@@ -191,8 +192,3 @@ class FilterMixin(FilterMixin):
         context = super(FilterMixin, self).get_context_data(**kwargs)
         context['filter'] = self.filterset
         return context
-
-
-class SuccessUrlMixin(object):
-    def get_success_url(self):
-        return self.admin.get_success_url()
