@@ -9,15 +9,15 @@ from .views.list import ListView
 from .views.edit import AddView, EditView, DeleteView
 
 
-def table_factory(model, fields=None, action='edit'):
-    linkcol = fields[0] if fields else 'id'
-    view_tuple = (model._meta.app_label, model._meta.model_name, action)
-    meta_attrs = {'model': model, 'fields': fields}
-    attrs = {
-        linkcol: tables.columns.LinkColumn('cbvadmin:%s_%s_%s' % view_tuple,
-                                           args=[A('pk')]),
-        'Meta': type('Meta', (object,), meta_attrs)
-    }
+def table_factory(model, fields=None, action='edit', extra={}):
+    attrs = {'Meta': type('Meta', (object,), {
+        'model': model, 'fields': fields})}
+    if action is not None:
+        linkcol = fields[0] if fields else 'id'
+        view_tuple = (model._meta.app_label, model._meta.model_name, action)
+        attrs.update({linkcol: tables.columns.LinkColumn(
+            'cbvadmin:%s_%s_%s' % view_tuple, args=[A('pk')])})
+    attrs.update(extra)
     return type('%sTable' % model._meta.object_name,
                 (tables.Table,), attrs)
 
