@@ -48,7 +48,8 @@ class ModelAdmin(BaseAdmin):
         return view_class
 
     def get_table_class(self):
-        return table_factory(self.model_class, self.list_display)
+        return table_factory(self.model_class, self.list_display,
+                             action=self.default_object_action)
 
     def get_form_class(self, request, obj=None, **kwargs):
         """Return the form class to use."""
