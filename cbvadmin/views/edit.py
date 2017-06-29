@@ -7,13 +7,11 @@ __all__ = ['EditView', 'AddView', 'DeleteView']
 
 class EditView(AdminTemplateMixin, FormMixin, UpdateView):
     default_template = 'change_form.html'
-    fields = '__all__'
     success_message = _('%(_verbose_name)s saved')
 
 
 class AddView(AdminTemplateMixin, FormMixin, CreateView):
     default_template = 'change_form.html'
-    fields = '__all__'
     success_message = _('%(_verbose_name)s added')
 
 

@@ -145,14 +145,20 @@ class FormMixin(SuccessMixin):
     def get_form_class(self):
         form_class = self.admin.get_form_class(self.request, self.object)
         if form_class is None:
+            if self.form_class is None and self.fields is None:
+                self.fields = '__all__'
             form_class = super(FormMixin, self).get_form_class()
         return form_class
+
+    def get_form_helper(self):
+        helper = FormHelper()
+        helper.form_id = self.form_id
+        return helper
 
     def get_form(self, form_class=None):
         form = super(FormMixin, self).get_form(form_class)
         if not hasattr(form, 'helper'):
-            form.helper = FormHelper()
-        form.helper.form_id = self.form_id
+            form.helper = self.get_form_helper()
         return form
 
 
