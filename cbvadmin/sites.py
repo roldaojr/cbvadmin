@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from menu import MenuItem
 from .options import BaseAdmin
 from .views.dashboard import Dashboard
+from .views.user import PasswordChange
 from .utils import get_setting, sub_menu_generator
 
 
@@ -27,11 +28,14 @@ class AdminSite(object):
         self._menu_registry[app_label] = menu_func
 
     def get_urls(self):
-        dashboard_view = Dashboard.as_view(admin=BaseAdmin(site=self))
+        this_admin = BaseAdmin(site=self)
+        dashboard_view = Dashboard.as_view(admin=this_admin)
+        password_change_view = PasswordChange.as_view(admin=this_admin)
         urls = [
             url(r'^$', dashboard_view, name='dashboard'),
             url(r'^login$', self.login, name='login'),
-            url(r'^logout$', self.logout, name='logout')
+            url(r'^logout$', self.logout, name='logout'),
+            url(r'^password$', password_change_view, name='password_change')
         ]
         for model, admin in self._registry.iteritems():
             model_name = (model._meta.app_label,
