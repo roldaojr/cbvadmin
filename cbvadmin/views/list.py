@@ -1,8 +1,9 @@
 from django_tables2 import SingleTableView, RequestConfig
-from .mixins import AdminTemplateMixin, FilterMixin
+from .mixins import AdminMixin, FilterMixin, PermissionRequiredMixin
 
 
-class TableListView(AdminTemplateMixin, FilterMixin, SingleTableView):
+class TableListView(PermissionRequiredMixin, AdminMixin, FilterMixin,
+                    SingleTableView):
     template_name = 'list.html'
 
     def get_table_class(self):

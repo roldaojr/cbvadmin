@@ -109,6 +109,68 @@ class LoginRequiredMixin(AccessMixin):
             request, *args, **kwargs)
 
 
+class PermissionRequiredMixin(AccessMixin):
+    """
+    View mixin which verifies that the logged in user has the specified
+    permission.
+    Class Settings
+    `permission_required` - the permission to check for.
+    `login_url` - the login url of site
+    `redirect_field_name` - defaults to "next"
+    `raise_exception` - defaults to False - raise 403 if set to True
+    Example Usage
+        class SomeView(PermissionRequiredMixin, ListView):
+            ...
+            # required
+            permission_required = "app.permission"
+            # optional
+            login_url = "/signup/"
+            redirect_field_name = "hollaback"
+            raise_exception = True
+            ...
+    """
+    permission_required = None  # Default required perms to none
+    raise_exception = True
+
+    def get_permission_required(self, request=None):
+        """
+        Get the required permissions and return them.
+        Override this to allow for custom permission_required values.
+        """
+        # Make sure that the permission_required attribute is set on the
+        # view, or raise a configuration error.
+        if self.permission_required is None:
+            raise ImproperlyConfigured(
+                '{0} requires the "permission_required" attribute to be '
+                'set.'.format(self.__class__.__name__))
+
+        return self.permission_required
+
+    def check_permissions(self, request):
+        """
+        Returns whether or not the user has permissions
+        """
+        if self.admin:
+            obj = self.get_object() if hasattr(self, 'get_object') else None
+            return self.admin.has_permission(request, self.action, obj)
+
+        perms = self.get_permission_required(request)
+        return request.user.has_perm(perms)
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Check to see if the user in the request has the required
+        permission.
+        """
+        has_permission = self.check_permissions(request)
+
+        if not has_permission:
+            return self.handle_no_permission(request)
+
+        return super(PermissionRequiredMixin, self).dispatch(
+            request, *args, **kwargs)
+
+
 class AdminTemplateMixin(object):
     def get_template_names(self, *args, **kwargs):
         template_names = super(
@@ -122,6 +184,11 @@ class AdminTemplateMixin(object):
         theme_templates = map(lambda t: 'cbvadmin/%s/%s' % (theme, t),
                               reversed(template_names))
         return admin_templates + theme_templates
+
+
+class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
+    admin = None
+    action = None
 
 
 class SuccessMixin(SuccessMessageMixin):

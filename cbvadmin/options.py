@@ -2,6 +2,7 @@ import six
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.utils.functional import cached_property
+from django.contrib.auth import get_permission_codename
 from menu import MenuItem
 from .tables import table_factory
 from .views.list import ListView
@@ -38,11 +39,19 @@ class ModelAdmin(BaseAdmin):
         self.model_class = model_class
         self.model_opts = model_class._meta
 
-    def has_permission(self, action, obj=None):
-        return True
+    def has_permission(self, request, action, obj=None):
+        # fix action for permission name
+        if action in ('edit', 'list'):
+            action = 'change'
+
+        opts = self.model_class._meta
+        permission = '%s.%s' % (opts.app_label, get_permission_codename(
+            action, opts))
+        return request.user.has_perm(permission)
 
     def get_view_class(self, action):
         view_class = getattr(self, '%s_view_class' % action)
+        view_class.action = action
         if view_class and not hasattr(view_class, 'admin'):
             view_class.admin = None
         return view_class
