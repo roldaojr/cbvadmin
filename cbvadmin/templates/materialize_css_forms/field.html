@@ -3,7 +3,7 @@
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
-    <div id="div_{{ field.auto_id }}" class="{% if not field|is_select %}input-field {% endif %}col s12{% if field.errors and form_show_errors %} error{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}">{% spaceless %}
+    <div id="div_{{ field.auto_id }}" class="{% if not field|is_select and not field|is_checkbox %}input-field {% endif %}col s12{% if field.errors and form_show_errors %} error{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}">{% spaceless %}
        
         {% if field|is_checkbox %}
             {% crispy_field field %}
