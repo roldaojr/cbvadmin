@@ -151,7 +151,10 @@ class PermissionRequiredMixin(AccessMixin):
         Returns whether or not the user has permissions
         """
         if self.admin:
-            obj = self.get_object() if hasattr(self, 'get_object') else None
+            try:
+                obj = self.get_object()
+            except AttributeError:
+                obj = None
             return self.admin.has_permission(request, self.action, obj)
 
         perms = self.get_permission_required(request)
