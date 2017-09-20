@@ -1,0 +1,10 @@
+{% extends 'cbvadmin/materialize/change_form.html' %}
+{% load i18n %}
+
+{% block actions %}
+{{ block.super }}
+<ul id="nav-mobile" class="right">
+  <li class="hide-on-med-and-down"><a class="form-submit" href="{% url view.admin.urls.passwordreset object.pk %}"><i class="left material-icons">more</i>{% trans 'Change password' %}</a></li>
+  <li class="hide-on-large-only"><a class="form-submit" href="{% url view.admin.urls.passwordreset object.pk %}"><i class="material-icons">more</i></a></li>
+</ul>
+{% endblock %}

@@ -1,12 +1,13 @@
 import six
-from django.core.urlresolvers import reverse
 from django.conf.urls import url
-from django.utils.functional import cached_property
 from django.contrib.auth import get_permission_codename
+from django.core.urlresolvers import reverse
+from django.utils.functional import cached_property
 from menu import MenuItem
 from .tables import table_factory
-from .views.list import ListView
 from .views.edit import AddView, EditView, DeleteView
+from .views.list import ListView
+from .views.user import PasswordReset, UserEditView
 
 
 class BaseAdmin(object):
@@ -114,3 +115,26 @@ class ModelAdmin(BaseAdmin):
 
     def get_success_url(self, view):
         return reverse(self.urls['default'])
+
+
+class UserAdmin(ModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'active')
+    edit_view_class = UserEditView
+    passwordreset_view_class = PasswordReset
+
+    def get_actions(self):
+        actions = super(UserAdmin, self).get_actions()
+        actions['passwordreset'] = 'object'
+        return actions
+
+    def get_form_class(self, request, obj=None, **kwargs):
+        if obj:
+            from django.contrib.auth.forms import UserChangeForm
+            return UserChangeForm
+        else:
+            from django.contrib.auth.forms import UserCreationForm
+            return UserCreationForm
+
+
+class GroupAdmin(ModelAdmin):
+    list_display = ('name',)
