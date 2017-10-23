@@ -175,6 +175,10 @@ class PermissionRequiredMixin(AccessMixin):
 
 
 class AdminTemplateMixin(object):
+    def get_admin_template(self, name):
+        theme = get_setting('theme', 'materialize')
+        return 'cbvadmin/%s/%s' % (theme, name)
+
     def get_template_names(self, *args, **kwargs):
         template_names = super(
             AdminTemplateMixin, self).get_template_names(*args, **kwargs)

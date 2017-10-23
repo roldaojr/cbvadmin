@@ -1,5 +1,5 @@
 {% extends 'cbvadmin/materialize/base_site.html' %}
-{% load i18n %}
+{% load static i18n django_tables2 %}
 
 {% block title %}{{ view.admin.model_opts.verbose_name_plural|capfirst }}{% endblock %}
 
@@ -32,6 +32,18 @@
 {% block content %}
 {% load render_table from django_tables2 %}
 {% render_table table 'cbvadmin/materialize/table.html' %}
+
+{% if table.page.has_next %}
+<div class="endless_container">
+    <a class="endless_more" style="display: none;" href="{% querystring table.prefixed_page_field=table.page.next_page_number %}">{% trans "more" %}</a>
+    <div class="endless_loading" style="display: none;">
+        <div class="progress">
+            <div class="indeterminate"></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% include 'cbvadmin/materialize/filter.html' %}
 {% include 'cbvadmin/materialize/sort.html' %}
 {% endblock %}
@@ -58,4 +70,7 @@
     float: right;
 }
 </style>
+{% endblock %}
+{% block extrascript %}
+<script type="text/javascript" src="{% static 'cbvadmin/materialize/pagination.js' %}"></script>
 {% endblock %}

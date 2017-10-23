@@ -24,5 +24,12 @@ class TableListView(PermissionRequiredMixin, AdminMixin, FilterMixin,
         else:
             return self.get_queryset()
 
+    def get_template_names(self, *args, **kwargs):
+        if 'querystring_key' in self.request.GET:
+            return self.get_admin_template('table.html')
+        else:
+            return super(TableListView, self).get_template_names(
+                *args, **kwargs)
+
 
 ListView = TableListView
