@@ -8,6 +8,9 @@ class UserForm(forms.ModelForm):
         Permission.objects.exclude(content_type__app_label__in=[
             'admin', 'contenttypes', 'sessions']),
         widget=forms.widgets.CheckboxSelectMultiple, required=False)
+    groups = forms.ModelMultipleChoiceField(
+        Group.objects.all(), widget=forms.widgets.CheckboxSelectMultiple,
+        required=False)
 
     @property
     def helper(self):
@@ -23,7 +26,10 @@ class UserForm(forms.ModelForm):
                 Field('is_active', wrapper_class='l4'),
                 Field('is_staff', wrapper_class='l4'),
                 Field('is_superuser', wrapper_class='l4')),
-            Row(Field('groups'), Field('user_permissions')))
+            Row(
+                Field('groups', wrapper_class='l6'),
+                Field('user_permissions', wrapper_class='l6')
+            ))
         return helper
 
     class Meta:
