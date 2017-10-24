@@ -2,12 +2,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic.edit import FormView
 from django.views.generic import UpdateView
 from django.utils.translation import ugettext_lazy as _
-from .edit import EditView
 from .mixins import FormMixin, AdminTemplateMixin, LoginRequiredMixin
-
-
-class UserEditView(EditView):
-    default_template = 'edit_user.html'
 
 
 class PasswordChange(LoginRequiredMixin, AdminTemplateMixin, FormMixin,

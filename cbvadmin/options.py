@@ -7,7 +7,7 @@ from menu import MenuItem
 from .tables import table_factory
 from .views.edit import AddView, EditView, DeleteView
 from .views.list import ListView
-from .views.user import PasswordReset, UserEditView
+from .views.user import PasswordReset
 
 
 class BaseAdmin(object):
@@ -119,7 +119,6 @@ class ModelAdmin(BaseAdmin):
 
 class UserAdmin(ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'active')
-    edit_view_class = UserEditView
     passwordreset_view_class = PasswordReset
 
     def get_actions(self):
@@ -129,8 +128,8 @@ class UserAdmin(ModelAdmin):
 
     def get_form_class(self, request, obj=None, **kwargs):
         if obj:
-            from django.contrib.auth.forms import UserChangeForm
-            return UserChangeForm
+            from .forms import UserForm
+            return UserForm
         else:
             from django.contrib.auth.forms import UserCreationForm
             return UserCreationForm
@@ -138,3 +137,7 @@ class UserAdmin(ModelAdmin):
 
 class GroupAdmin(ModelAdmin):
     list_display = ('name',)
+
+    def get_form_class(self, request, obj=None, **kwargs):
+        from .forms import GroupForm
+        return GroupForm
