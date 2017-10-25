@@ -57,6 +57,12 @@ class ModelAdmin(BaseAdmin):
             view_class.admin = None
         return view_class
 
+    def get_view_kwargs(self, action):
+        """Return the view class custom kwargs to create view."""
+        if action == 'edit':
+            return {'default_template': 'edit_user.html'}
+        return {}
+
     def get_table_class(self):
         return table_factory(self.model_class, self.list_display,
                              action=self.default_object_action)
@@ -76,7 +82,6 @@ class ModelAdmin(BaseAdmin):
     def get_urls(self):
         app = self.model_class._meta.app_label
         model = self.model_class._meta.model_name
-        view_kwargs = {'model': self.model_class, 'admin': self}
         urls = []
         # get valid actions
         actions = self.get_actions()
@@ -92,6 +97,8 @@ class ModelAdmin(BaseAdmin):
                 pattern = r'^%s$' % action
 
             view_class = self.get_view_class(action)
+            view_kwargs = self.get_view_kwargs(action)
+            view_kwargs.update({'model': self.model_class, 'admin': self})
             urls.append(url(pattern, view_class.as_view(**view_kwargs),
                             name='%s_%s_%s' % (app, model, action)))
         return urls
