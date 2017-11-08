@@ -186,10 +186,10 @@ class AdminTemplateMixin(object):
         if default_template:
             template_names.append(default_template)
         theme = get_setting('theme', 'materialize')
-        admin_templates = map(lambda t: 'cbvadmin/%s' % t,
-                              reversed(template_names))
-        theme_templates = map(lambda t: 'cbvadmin/%s/%s' % (theme, t),
-                              reversed(template_names))
+        admin_templates = ['cbvadmin/%s' % t for t in
+                           reversed(template_names)]
+        theme_templates = ['cbvadmin/%s/%s' % (theme, t) for t in
+                           reversed(template_names)]
         return admin_templates + theme_templates
 
 

@@ -37,7 +37,7 @@ class AdminSite(object):
             url(r'^logout$', self.logout, name='logout'),
             url(r'^password$', password_change_view, name='password_change')
         ]
-        for model, admin in self._registry.iteritems():
+        for model, admin in six.iteritems(self._registry):
             model_name = (model._meta.app_label,
                           model._meta.model_name)
             urls.append(url('%s/%s/' % model_name, include(admin.get_urls())))
@@ -46,7 +46,7 @@ class AdminSite(object):
     def get_menu(self):
         admin_menu = [MenuItem('Dashboard', reverse('cbvadmin:dashboard'))]
         admin_sub_menus = defaultdict(lambda: [])
-        for model, admin in self._registry.iteritems():
+        for model, admin in six.iteritems(self._registry):
             app_label = model._meta.app_label
             sub_menu = admin.get_menu()
             if sub_menu:
