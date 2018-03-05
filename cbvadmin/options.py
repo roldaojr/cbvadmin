@@ -59,8 +59,6 @@ class ModelAdmin(BaseAdmin):
 
     def get_view_kwargs(self, action):
         """Return the view class custom kwargs to create view."""
-        if action == 'edit':
-            return {'default_template': 'edit_user.html'}
         return {}
 
     def get_table_class(self):
@@ -120,7 +118,7 @@ class ModelAdmin(BaseAdmin):
                          reverse(self.urls['default']),
                          weight=self.menu_weight)]
 
-    def get_success_url(self, view):
+    def get_success_url(self, view=None):
         return reverse(self.urls['default'])
 
 
@@ -132,6 +130,12 @@ class UserAdmin(ModelAdmin):
         actions = super(UserAdmin, self).get_actions()
         actions['passwordreset'] = 'object'
         return actions
+
+    def get_view_kwargs(self, action):
+        """Return the view class custom kwargs to create view."""
+        if action == 'edit':
+            return {'default_template': 'edit_user.html'}
+        return {}
 
     def get_form_class(self, request, obj=None, **kwargs):
         if obj:
