@@ -17,7 +17,7 @@ class Category(models.Model):
 class Computer(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    category = models.ForeignKey(Category, null=True)
+    category = models.ForeignKey(Category, null=True, on_delete='set_null')
 
     def __str__(self):
         return self.name

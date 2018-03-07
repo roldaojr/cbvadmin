@@ -3,7 +3,7 @@ import six
 from collections import defaultdict
 from django.conf.urls import url, include
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.functional import cached_property
 from menu import MenuItem
 from .options import BaseAdmin

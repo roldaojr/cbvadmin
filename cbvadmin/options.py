@@ -1,7 +1,7 @@
 import six
 from django.conf.urls import url
 from django.contrib.auth import get_permission_codename
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.functional import cached_property
 from menu import MenuItem
 from .tables import table_factory
