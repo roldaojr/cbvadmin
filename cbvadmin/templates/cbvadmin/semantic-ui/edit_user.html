@@ -1,0 +1,45 @@
+{% extends 'cbvadmin/semantic-ui/change_form.html' %}
+{% load i18n %}
+
+{% block actions %}
+<div class="actions">
+  <div class="ui mobile only fluid">
+    <button type="submit" class="ui fluid green save button">
+      <i class="save icon"></i>
+      {% trans 'Save' %}
+    </button>
+    <a href="{% url view.admin.urls.passwordreset object.pk %}" class="ui fluid secondary button">
+      {% trans 'Change password' %}
+    </a>
+    {% if object and view.admin.urls.delete %}
+    <div class="ui basic fluid red delete button">
+      <i class="trash icon"></i>
+      {% trans 'Delete' %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="ui secondary mobile hidden menu">
+    {% if object and view.admin.urls.delete %}
+    <div class="item">    
+      <div class="ui basic red delete button">
+        <i class="trash icon"></i>
+        {% trans 'Delete' %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="right menu">
+      <div class="item">
+        <a href="{% url view.admin.urls.passwordreset object.pk %}" class="ui secondary button">
+        {% trans 'Change password' %}
+        </a>
+      </div>
+      <div class="item">
+        <button type="submit" class="ui green save button">
+          <i class="save icon"></i>
+          {% trans 'Save' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

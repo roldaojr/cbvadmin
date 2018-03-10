@@ -1,0 +1,26 @@
+{% load crispy_forms_tags i18n %}
+{% block filters %}
+{% if view.has_filters and filter.form %}
+<div class="ui hidden secondary segment" id="filter-box">
+  <form id="filter-form" class="ui form">
+    <div class="fields">
+      {% for field in filter.form %}
+      {{ field|as_crispy_field }}
+      {% endfor %}
+      <div class="field">
+        <label>&nbsp;</label>
+        <div class="ui buttons">
+          <a href="?" class="ui secondary basic button">
+            {% trans 'Clear' %}
+          </a>
+          <div class="or" data-text="{% trans 'or' %}"></div>
+          <button type="submit" class="ui primary button">
+            {% trans 'Filter' %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

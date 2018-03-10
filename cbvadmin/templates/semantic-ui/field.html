@@ -1,0 +1,59 @@
+{% load crispy_forms_field %}
+{% load crispy_forms_filters %}
+{% load l10n %}
+
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+    <div id="div_{{ field.auto_id }}" class="field{% if field.field.required %} required{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field.errors and form_show_errors %} error{% endif %}{% if field|is_checkbox %} inline{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
+        {% if field|is_checkbox %}<div class="ui checkbox">{% endif %}
+
+            {% if field.label %}
+                {% if field|is_checkbox %}
+                    {% crispy_field field %}
+                {% endif %}
+
+                <label for="{{ field.id_for_label }}" {% if field.field.required %}class="requiredField"{% endif %}>
+                    {{ field.label|safe }}
+                </label>
+            {% endif %}
+
+            {% if field|is_radioselect %}
+                <div class="grouped fields">
+                    {% for choice in field.field.choices %}
+                        <div class="field">
+                            <div class="ui radio checkbox checked{% if inline_class %} {{ inline_class }}{% endif %}">
+                                <input type="radio"{% if choice.0|stringformat:"s" == field.value|stringformat:"s" %} checked="checked"{% endif %} name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}" value="{{ choice.0|unlocalize }}" {{ field.field.widget.attrs|flatatt }}>
+                                <label for="id_{{ field.html_name }}_{{ forloop.counter }}">{{ choice.1|unlocalize }}</label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if field|is_checkboxselectmultiple %}
+                {% include 'semantic-ui/layout/checkboxselectmultiple.html' %}
+            {% endif %}
+
+            {% if not field|is_checkbox and not field|is_radioselect and not field|is_checkboxselectmultiple %}
+                {% crispy_field field %}
+            {% endif %}
+
+            {% if field.help_text %}
+                <div id="hint_{{ field.auto_id }}" class="ui pointing label">{{ field.help_text|safe }}</div>
+            {% endif %}
+
+        {% if field|is_checkbox %}</div>{% endif %}
+
+        {% if form_show_errors %}
+            {% if field.errors %}
+                <div class="ui error message">
+                    {% for error in field.errors %}
+                        <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"><i class="warning sign icon"></i>&nbsp;<span>{{ error }}</span></p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+{% endif %}

@@ -1,0 +1,22 @@
+{% for item in menu %}
+{% if item.visible %}
+{% if item.children %}
+  <div class="item">
+    {% if item.icon %}<i class="{{ item.icon }} icon"></i>{% endif %}
+    {{ item.title }}
+    <div class="menu">
+{% for subitem in item.children %}
+      <a class="item" {% if subitem.url %}href="{{ subitem.url }}"{% endif %}>
+        {{ subitem.title }}
+      </a>
+{% endfor %}
+    </div>
+  </div>
+{% else %}
+  <a class="item" {% if item.url %}href="{{ item.url }}"{% endif %}>
+    {% if item.icon %}<i class="{{ item.icon }} icon"></i>{% endif %}
+    {{ item.title }}
+  </a>
+{% endif %}
+{% endif %}
+{% endfor %}

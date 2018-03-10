@@ -1,0 +1,16 @@
+{% extends 'cbvadmin/semantic-ui/base_site.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="ui horizontal segments">
+{% for counter in counters %}
+  <div class="ui segment statistic">
+    <div class="label">
+      {{ counter.name }}
+    </div>
+    <div class="value">
+      {{ counter.value }}
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'cbvadmin/semantic-ui/base_site.html' %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block extrascript %}
+{{ form.media.js }}
+<script type="text/javascript">
+$('.delete.button').click(function() {
+  $('#confirm-delete-modal').modal('show')
+})
+$('.save.button').click(function(e){
+  $('#change-form').submit()
+})
+</script>
+{% endblock %}
+
+{% block title %}
+{% if object %}{% trans 'Change' %}{% else %}{% trans 'Add' %}{% endif %}
+{% filter capfirst %}{{ view.admin.model_opts.verbose_name }}{% endfilter %}
+{% endblock %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+<form class="ui form" method="post" id="change-form">
+{% crispy form %}
+{% block actions %}
+<div class="actions">
+  <div class="ui mobile only fluid">
+    <button type="submit" class="ui fluid green save button">
+      <i class="save icon"></i>
+      {% trans 'Save' %}
+    </button>
+    {% if object and view.admin.urls.delete %}
+    <div class="ui basic fluid red delete button">
+      <i class="trash icon"></i>
+      {% trans 'Delete' %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="ui secondary mobile hidden menu">
+  {% if object and view.admin.urls.delete %}
+    <div class="item">
+      <div class="ui basic red delete button">
+        <i class="trash icon"></i>
+        {% trans 'Delete' %}
+      </div>
+    </div>
+  {% endif %}
+    <div class="right item">
+      <button type="submit" class="ui green save button">
+        <i class="save icon"></i>
+        {% trans 'Save' %}
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+</form>
+{% if object and view.admin.urls.delete %}
+{% include 'cbvadmin/semantic-ui/delete_modal.html' %}
+{% endif %}
+{% endblock %}

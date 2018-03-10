@@ -1,0 +1,76 @@
+{% extends 'cbvadmin/semantic-ui/base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block extrahead %}
+<style type="text/css">
+body {
+  background-color: #DADADA;
+}
+body > .grid {
+  height: 100%;
+}
+.image {
+  margin-top: -100px;
+}
+.column {
+  max-width: 450px;
+}
+</style>
+{% endblock %}
+
+{% block outer_content %}
+<div class="ui middle aligned center aligned grid">
+  <div class="column">
+    <h2 class="ui header">
+      <div class="content">
+        CBV Admin
+      </div>
+    </h2>
+    <form class="ui large form" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}" />
+      <div class="ui segment">
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="user icon"></i>
+            <input type="text" name="username" placeholder="{% trans 'Username' %}">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input type="password" name="password" placeholder="{% trans 'Password' %}">
+          </div>
+        </div>
+        <button type="submit" class="ui fluid large primary submit button">{% trans 'Login' %}</button>
+      </div>
+      <div class="ui error message"></div>
+    </form>
+  </div>
+</div>
+<!--
+<div id="login-page" class="row">
+    <div class="col s12 z-depth-4 card-panel">
+		<div class="row">
+            <div class="logo input-field col s12 center">
+                CBV Admin
+            </div>
+        </div>
+        <form method="POST" class="login-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}" />
+            {% for field in form %}
+            <div class="row">
+                {{ field|as_crispy_field }}
+            </div>
+            {% endfor %}
+            <div class="row">
+                <div class="input-field col s12">
+                    <button type="submit" class="btn waves-effect waves-light col s12 submit">{% trans 'Login' %}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>-->
+{% endblock %}

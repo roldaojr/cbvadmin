@@ -1,4 +1,0 @@
-<div {{ fieldset.flat_attrs|safe }} {% if fieldset.css_id %}id="{{ fieldset.css_id }}"{% endif %}  class="card-panel{% if fieldset.css_class or form_style %} {{ fieldset.css_class }} {{ form_style }}"{% endif %}">
-    <h4 class="header2">{{ legend|safe }}</h4>
-    {{ fields|safe }} 
-</div>

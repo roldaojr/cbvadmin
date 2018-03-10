@@ -11,10 +11,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cbvadmin',
+    'semantic_ui',
+    'crispy_forms',
     'django_tables2',
     'django_filters',
     'menu',
-    'crispy_forms',
     'demo.app'
 ]
 
@@ -67,4 +68,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-from cbvadmin.themes.materialize.settings import *
+CBVADMIN_THEME = 'semantic-ui'
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('semantic-ui',)
+CRISPY_TEMPLATE_PACK = 'semantic-ui'

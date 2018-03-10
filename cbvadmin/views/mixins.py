@@ -227,6 +227,7 @@ class FormMixin(SuccessMixin):
     def get_form_helper(self):
         helper = FormHelper()
         helper.form_id = self.form_id
+        helper.form_tag = False
         return helper
 
     def get_form(self, form_class=None):
