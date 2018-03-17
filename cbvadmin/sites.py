@@ -18,6 +18,8 @@ class AdminSite(object):
     title = 'CBVAdmin'
     login_form = None
     _menu_registry = defaultdict(lambda: sub_menu_generator)
+    dashboard_view_class = Dashboard
+    passwordchange_view_class = PasswordChange
 
     def register(self, model_class, admin_class):
         admin = admin_class(model_class)
@@ -29,8 +31,9 @@ class AdminSite(object):
 
     def get_urls(self):
         this_admin = BaseAdmin(site=self)
-        dashboard_view = Dashboard.as_view(admin=this_admin)
-        password_change_view = PasswordChange.as_view(admin=this_admin)
+        kwargs = {'admin': this_admin}
+        dashboard_view = self.dashboard_view_class.as_view(**kwargs)
+        password_change_view = self.passwordchange_view_class.as_view(**kwargs)
         urls = [
             url(r'^$', dashboard_view, name='dashboard'),
             url(r'^login$', self.login, name='login'),
@@ -60,7 +63,7 @@ class AdminSite(object):
         return self.get_urls(), 'cbvadmin', self.name
 
     def login(self, request):
-        THEME = get_setting('theme', 'materialize')
+        THEME = get_setting('theme', 'semantic-ui')
         from django.contrib.auth.views import login
         context = {}
         if (REDIRECT_FIELD_NAME not in request.GET and
@@ -76,10 +79,6 @@ class AdminSite(object):
     def logout(self, request):
         from django.contrib.auth.views import logout_then_login
         return logout_then_login(request, login_url=reverse('cbvadmin:login'))
-
-    @cached_property
-    def theme_colors(self):
-        return get_setting('theme_colors', 'blue darken-4 white-text')
 
 
 site = AdminSite()
