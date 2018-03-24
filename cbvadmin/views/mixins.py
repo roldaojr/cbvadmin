@@ -1,4 +1,5 @@
 import inspect
+import six
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -196,6 +197,31 @@ class AdminTemplateMixin(object):
 class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
     admin = None
     action = None
+
+    def get_context_data(self, **kwargs):
+        context = super(AdminMixin, self).get_context_data(**kwargs)
+        admin_perms = {
+            action: self.admin.has_permission(self.request, action)
+            for action in self.admin.get_actions().keys()
+        }
+        admin_perms.update({
+            'default': self.admin.has_permission(
+                self.request, self.admin.default_action),
+            'default_object': self.admin.has_permission(
+                self.request, self.admin.default_object_action)
+        })
+        admin_urls = {
+            action: url
+            for action, url in self.admin.get_actions_urls().items()
+            if admin_perms[action]
+        }
+        context.update({
+            'admin': {
+                'perms': admin_perms,
+                'urls': admin_urls
+            }
+        })
+        return context
 
 
 class SuccessMixin(SuccessMessageMixin):

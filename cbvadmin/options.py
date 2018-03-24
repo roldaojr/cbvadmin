@@ -12,11 +12,22 @@ from .views.user import PasswordReset
 
 class BaseAdmin(object):
     site = None
+    default_action = None
+    default_object_action = None
 
     def __init__(self, *args, **kwargs):
         for key in kwargs:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
+
+    def get_actions_urls(self):
+        return {}
+
+    def get_actions(self):
+        return {}
+
+    def has_permission(self, request, action, obj=None):
+        return True
 
 
 class ModelAdmin(BaseAdmin):
@@ -42,8 +53,10 @@ class ModelAdmin(BaseAdmin):
 
     def has_permission(self, request, action, obj=None):
         # fix action for permission name
-        if action in ('edit', 'list'):
+        if action == 'edit':
             action = 'change'
+        elif action == 'list':
+            action = 'view'
 
         opts = self.model_class._meta
         permission = '%s.%s' % (opts.app_label, get_permission_codename(
@@ -96,13 +109,15 @@ class ModelAdmin(BaseAdmin):
 
             view_class = self.get_view_class(action)
             view_kwargs = self.get_view_kwargs(action)
-            view_kwargs.update({'model': self.model_class, 'admin': self})
+            view_kwargs.update({
+                'model': self.model_class,
+                'admin': self
+            })
             urls.append(url(pattern, view_class.as_view(**view_kwargs),
                             name='%s_%s_%s' % (app, model, action)))
         return urls
 
-    @cached_property
-    def urls(self):
+    def get_actions_urls(self):
         app = self.model_class._meta.app_label
         model = self.model_class._meta.model_name
         urls = {a: 'cbvadmin:%s_%s_%s' % (app, model, a)
@@ -113,9 +128,18 @@ class ModelAdmin(BaseAdmin):
             app, model, self.default_object_action)
         return urls
 
+    @cached_property
+    def urls(self):
+        return self.get_actions_urls()
+
     def get_menu(self):
+        app = self.model_class._meta.app_label
+        model = self.model_class._meta.model_name
+        print(app, model)
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
                          reverse(self.urls['default']),
+                         check=lambda request: request.user.has_perm(
+                             '%s.change_%s' % (app, model)),
                          weight=self.menu_weight)]
 
     def get_success_url(self, view=None):

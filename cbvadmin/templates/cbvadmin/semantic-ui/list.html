@@ -12,11 +12,11 @@
       {% trans 'Filter' %}
     </div>
   {% endif %}
-  {% if view.has_filters and filter.form and view.admin.urls.add %}
+  {% if view.has_filters and filter.form and admin.urls.add %}
     <div class="or" data-text="{% trans 'or' %}"></div>
   {% endif %}
-  {% if view.admin.urls.add %}
-    <a href="{% url view.admin.urls.add %}" class="ui primary button">
+  {% if admin.urls.add %}
+    <a href="{% url admin.urls.add %}" class="ui primary button">
       <i class="plus icon"></i>
       {% trans 'Add' %}
     </a>
@@ -31,11 +31,11 @@
       </div>
     </div>
   {% endif %}
-  {% if view.admin.urls.add %}
+  {% if admin.urls.add %}
     <div class="right item">
-      <a href="{% url view.admin.urls.add %}" class="ui primary button">
+      <a href="{% url admin.urls.add %}" class="ui primary button">
         <i class="plus icon"></i>
-        {% trans 'Add' %} {{ view.admin.model_opts.verbose_name }}
+        {% trans 'Add' %} {{ admin.model_opts.verbose_name }}
       </a>
     </div>
   {% endif %}

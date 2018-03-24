@@ -33,7 +33,7 @@ $('.save.button').click(function(e){
       <i class="save icon"></i>
       {% trans 'Save' %}
     </button>
-    {% if object and view.admin.urls.delete %}
+    {% if object and admin.urls.delete %}
     <div class="ui basic fluid red delete button">
       <i class="trash icon"></i>
       {% trans 'Delete' %}
@@ -41,7 +41,7 @@ $('.save.button').click(function(e){
     {% endif %}
   </div>
   <div class="ui secondary mobile hidden menu">
-  {% if object and view.admin.urls.delete %}
+  {% if object and admin.urls.delete %}
     <div class="item">
       <div class="ui basic red delete button">
         <i class="trash icon"></i>
@@ -59,7 +59,7 @@ $('.save.button').click(function(e){
 </div>
 {% endblock %}
 </form>
-{% if object and view.admin.urls.delete %}
+{% if object and admin.urls.delete %}
 {% include 'cbvadmin/semantic-ui/delete_modal.html' %}
 {% endif %}
 {% endblock %}
