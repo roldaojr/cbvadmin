@@ -4,12 +4,11 @@ from collections import defaultdict
 from django.conf.urls import url, include
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
-from django.utils.functional import cached_property
 from menu import MenuItem
 from .options import BaseAdmin
 from .views.dashboard import Dashboard
 from .views.user import PasswordChange
-from .utils import get_setting, sub_menu_generator
+from .utils import get_setting, menu_generator
 
 
 class AdminSite(object):
@@ -17,7 +16,7 @@ class AdminSite(object):
     name = 'cbvadmin'
     title = 'CBVAdmin'
     login_form = None
-    _menu_registry = defaultdict(lambda: sub_menu_generator)
+    _menu_registry = defaultdict(lambda: menu_generator)
     dashboard_view_class = Dashboard
     passwordchange_view_class = PasswordChange
 
