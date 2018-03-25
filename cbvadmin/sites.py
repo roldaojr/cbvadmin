@@ -13,12 +13,14 @@ from .utils import get_setting, menu_generator
 
 class AdminSite(object):
     _registry = {}
-    name = 'cbvadmin'
-    title = 'CBVAdmin'
     login_form = None
     _menu_registry = defaultdict(lambda: menu_generator)
     dashboard_view_class = Dashboard
     passwordchange_view_class = PasswordChange
+
+    def __init__(self):
+        self.name = get_setting('SITE_NAME', 'cbvadmin')
+        self.title = get_setting('SITE_TITLE', 'CBVAdmin')
 
     def register(self, model_class, admin_class):
         admin = admin_class(model_class)
