@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block extrascript %}
+{{ block.super }}
 {{ form.media.js }}
 <script type="text/javascript">
 $('.ui.cancel.button').click(function() {

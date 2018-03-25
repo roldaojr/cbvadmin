@@ -51,6 +51,7 @@
 {% endblock %}
 
 {% block extrascript %}
+{{ block.super }}
 <script type="text/javascript">
   $('.filter.button').click(function() {
     $('#filter-box').transition('slide down')
