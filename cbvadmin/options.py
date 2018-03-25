@@ -138,7 +138,7 @@ class ModelAdmin(BaseAdmin):
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
                          reverse(self.urls['default']),
                          check=lambda request: request.user.has_perm(
-                             '%s.change_%s' % (app, model)),
+                             '%s.view_%s' % (app, model)),
                          weight=self.menu_weight)]
 
     def get_success_url(self, view=None):
