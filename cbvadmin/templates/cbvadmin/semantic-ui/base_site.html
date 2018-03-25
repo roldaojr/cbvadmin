@@ -34,7 +34,9 @@
 {% endfor %}
 {% endif %}
   <div class="ui basic segment">
+    {% block pageheader %}
     <h1 class="ui header">{% block title %}{% endblock %}</h1>
+    {% endblock %}
     {% block content %}{% endblock %}
   </div>
 </div>
