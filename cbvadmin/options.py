@@ -55,7 +55,7 @@ class ModelAdmin(BaseAdmin):
         # fix action for permission name
         if action == 'edit':
             action = 'change'
-        elif action == 'list':
+        elif action in ('list', 'detail'):
             action = 'view'
 
         opts = self.model_class._meta
@@ -65,7 +65,7 @@ class ModelAdmin(BaseAdmin):
 
     def get_view_class(self, action):
         view_class = getattr(self, '%s_view_class' % action)
-        view_class.action = action
+        view_class.action = None
         if view_class and not hasattr(view_class, 'admin'):
             view_class.admin = None
         return view_class
@@ -111,7 +111,8 @@ class ModelAdmin(BaseAdmin):
             view_kwargs = self.get_view_kwargs(action)
             view_kwargs.update({
                 'model': self.model_class,
-                'admin': self
+                'action': action,
+                'admin': self,
             })
             urls.append(url(pattern, view_class.as_view(**view_kwargs),
                             name='%s_%s_%s' % (app, model, action)))
