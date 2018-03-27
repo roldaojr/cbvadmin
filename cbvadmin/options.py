@@ -20,14 +20,53 @@ class BaseAdmin(object):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
 
+    def get_view_class(self, action):
+        view_class = getattr(self, '%s_view_class' % action)
+        view_class.action = None
+        if view_class and not hasattr(view_class, 'admin'):
+            view_class.admin = None
+        return view_class
+
+    def get_view_kwargs(self, action):
+        """Return the view class custom kwargs to create view."""
+        return {}
+
     def get_actions_urls(self):
         return {}
 
     def get_actions(self):
         return {}
 
+    def get_urls(self):
+        return []
+
     def has_permission(self, request, action, obj=None):
         return True
+
+
+class SimpleAdmin(BaseAdmin):
+    def get_view_kwargs(self, action):
+        return {'action': action, 'admin': self}
+
+    def get_urls(self):
+        urls = []
+        actions = self.get_actions()
+
+        for action, target in six.iteritems(actions):
+            if action == self.default_action:
+                pattern = r'^$'
+            elif action == self.default_object_action:
+                pattern = r'^(?P<pk>\d+)/$'
+            elif target == 'object':
+                pattern = r'^(?P<pk>\d+)/%s$' % action
+            else:
+                pattern = r'^%s/$' % action
+
+            view_class = self.get_view_class(action)
+            view_kwargs = self.get_view_kwargs(action)
+            urls.append(url(pattern, view_class.as_view(**view_kwargs),
+                            name=action))
+        return urls
 
 
 class ModelAdmin(BaseAdmin):
@@ -62,17 +101,6 @@ class ModelAdmin(BaseAdmin):
         permission = '%s.%s' % (opts.app_label, get_permission_codename(
             action, opts))
         return request.user.has_perm(permission)
-
-    def get_view_class(self, action):
-        view_class = getattr(self, '%s_view_class' % action)
-        view_class.action = None
-        if view_class and not hasattr(view_class, 'admin'):
-            view_class.admin = None
-        return view_class
-
-    def get_view_kwargs(self, action):
-        """Return the view class custom kwargs to create view."""
-        return {}
 
     def get_table_class(self):
         return table_factory(self.model_class, self.list_display,
