@@ -5,18 +5,30 @@ from .sites import site
 from .options import SimpleAdmin, UserAdmin, GroupAdmin
 from .views.dashboard import Dashboard
 from .views.user import PasswordChange
+from .views.auth import (AdminPasswordResetView,
+                         AdminPasswordResetDoneView,
+                         AdminPasswordResetConfirmView,
+                         AdminPasswordResetCompleteView)
 
 
 class DefaultAdmin(SimpleAdmin):
     dashboard_view_class = Dashboard
     password_change_view_class = PasswordChange
+    password_reset_view_class = AdminPasswordResetView
+    password_reset_done_view_class = AdminPasswordResetDoneView
+    password_reset_confirm_view_class = AdminPasswordResetConfirmView
+    password_reset_complete_view_class = AdminPasswordResetCompleteView
 
     default_action = 'dashboard'
 
     def get_actions(self):
         return {
             'dashboard': 'collection',
-            'password_change': 'collection'
+            'password_change': 'collection',
+            'password_reset': 'collection',
+            'password_reset_done': 'collection',
+            'password_reset_confirm': 'collection',
+            'password_reset_complete': 'collection'
         }
 
     def get_menu(self):

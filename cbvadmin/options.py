@@ -59,6 +59,8 @@ class SimpleAdmin(BaseAdmin):
                 pattern = r'^(?P<pk>\d+)/$'
             elif target == 'object':
                 pattern = r'^(?P<pk>\d+)/%s$' % action
+            elif action == 'password_reset_confirm':
+                pattern = r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$'
             else:
                 pattern = r'^%s/$' % action
 

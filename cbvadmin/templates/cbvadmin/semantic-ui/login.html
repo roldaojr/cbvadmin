@@ -34,8 +34,9 @@ body > .grid {
           {% endif %}
           <input type="hidden" name="next" value="{{ next }}" />
           {{ form|crispy }}
-          <button type="submit" class="ui fluid large primary submit button">{% trans 'Login' %}</button>
+          <button type="submit" class="ui fluid large primary button">{% trans 'Login' %}</button>
         </form>
+        <a class="ui fluid button" href="{% url 'cbvadmin:password_reset' %}">{% trans 'Password reset' %}</a>
       </div>
     </div>
   </div>
