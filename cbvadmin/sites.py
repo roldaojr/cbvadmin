@@ -28,10 +28,7 @@ class AdminSite(object):
         self._menu_registry[app_label] = menu_func
 
     def get_urls(self):
-        urls = [
-            url(r'^login$', self.login, name='login'),
-            url(r'^logout$', self.logout, name='logout'),
-        ]
+        urls = []
         for name, admin in six.iteritems(self._simple_registry):
             if name == 'default':
                 urls.append(url('', include(admin.get_urls())))

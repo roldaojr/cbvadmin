@@ -5,7 +5,8 @@ from .sites import site
 from .options import SimpleAdmin, UserAdmin, GroupAdmin
 from .views.dashboard import Dashboard
 from .views.user import PasswordChange
-from .views.auth import (AdminPasswordResetView,
+from .views.auth import (AdminLoginView, AdminLogoutView,
+                         AdminPasswordResetView,
                          AdminPasswordResetDoneView,
                          AdminPasswordResetConfirmView,
                          AdminPasswordResetCompleteView)
@@ -13,6 +14,8 @@ from .views.auth import (AdminPasswordResetView,
 
 class DefaultAdmin(SimpleAdmin):
     dashboard_view_class = Dashboard
+    login_view_class = AdminLoginView
+    logout_view_class = AdminLogoutView
     password_change_view_class = PasswordChange
     password_reset_view_class = AdminPasswordResetView
     password_reset_done_view_class = AdminPasswordResetDoneView
@@ -24,6 +27,8 @@ class DefaultAdmin(SimpleAdmin):
     def get_actions(self):
         return {
             'dashboard': 'collection',
+            'login': 'collection',
+            'logout': 'collection',
             'password_change': 'collection',
             'password_reset': 'collection',
             'password_reset_done': 'collection',

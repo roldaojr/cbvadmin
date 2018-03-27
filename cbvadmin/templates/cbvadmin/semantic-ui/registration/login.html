@@ -10,6 +10,8 @@ body > .grid {
 </style>
 {% endblock %}
 
+{% block title %}{% trans 'Log in' %}{% endblock %}
+
 {% block outer_content %}
 <div class="ui middle aligned centered grid">
   <div class="row">
@@ -17,7 +19,7 @@ body > .grid {
       <div class="ui basic segment">
         <h2 class="ui center aligned header">
           <div class="content">
-            CBV Admin
+            {{ view.admin.site.title }}
           </div>
         </h2>
         <form class="ui large form" method="post">
