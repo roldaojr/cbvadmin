@@ -8,9 +8,11 @@
       <i class="save icon"></i>
       {% trans 'Save' %}
     </button>
+    {% if admin.urls.passwordreset %}
     <a href="{% url admin.urls.passwordreset object.pk %}" class="ui fluid secondary button">
       {% trans 'Change password' %}
     </a>
+    {% endif %}
     {% if object and admin.urls.delete %}
     <div class="ui basic fluid red delete button">
       <i class="trash icon"></i>
@@ -28,11 +30,13 @@
     </div>
     {% endif %}
     <div class="right menu">
+      {% if admin.urls.passwordreset %}
       <div class="item">
         <a href="{% url admin.urls.passwordreset object.pk %}" class="ui secondary button">
         {% trans 'Change password' %}
         </a>
       </div>
+      {% endif %}
       <div class="item">
         <button type="submit" class="ui green save button">
           <i class="save icon"></i>
