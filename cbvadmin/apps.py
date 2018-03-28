@@ -10,7 +10,9 @@ class CBVAdminConfig(AppConfig):
     def ready(self):
         super(CBVAdminConfig, self).ready()
         self.module.autodiscover()
-        post_migrate.connect(
-            update_permissions,
-            dispatch_uid='cbvadmin.permissions.update_permissions'
-        )
+
+
+post_migrate.connect(
+    update_permissions,
+    dispatch_uid='cbvadmin.permissions.update_permissions'
+)
