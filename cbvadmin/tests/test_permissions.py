@@ -31,7 +31,7 @@ class StaffUserTestCase(TestCase):
 class PermissionTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(username='user', password='user')
-        perms_map = {'list': 'change', 'edit': 'change'}
+        perms_map = {'list': 'view', 'edit': 'change'}
         for action in ('list', 'edit', 'add', 'delete'):
             user = User.objects.create_user(username='user_%s' % action,
                                             password='user_%s' % action)
