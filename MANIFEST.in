@@ -1,3 +1,6 @@
 recursive-include cbvadmin *
 global-exclude __pycache__
 global-exclude *.py[co]
+
+include README.md
+include LICENSE
