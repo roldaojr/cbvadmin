@@ -1,4 +1,6 @@
 import os
+from cbvadmin_semantic_ui.settings import cbvadmin_semantic_ui_settings
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ya3u!z@!eucn+7&f@-ug79qtdpo)wyetyrmt$4xh5)azlpib1g'
 DEBUG = True
@@ -11,7 +13,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cbvadmin',
-    'semantic_ui',
     'crispy_forms',
     'django_tables2',
     'django_filters',
@@ -68,6 +69,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CBVADMIN_THEME = 'semantic-ui'
-CRISPY_ALLOWED_TEMPLATE_PACKS = ('semantic-ui',)
-CRISPY_TEMPLATE_PACK = 'semantic-ui'
+cbvadmin_semantic_ui_settings(vars())

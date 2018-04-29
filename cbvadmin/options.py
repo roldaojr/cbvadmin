@@ -166,10 +166,10 @@ class ModelAdmin(BaseAdmin):
     def get_menu(self):
         app = self.model_class._meta.app_label
         model = self.model_class._meta.model_name
+        code = '%s.view_%s' % (app, model)
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
                          reverse(self.urls['default']),
-                         check=lambda request: request.user.has_perm(
-                             '%s.view_%s' % (app, model)),
+                         check=lambda request: request.user.has_perm(code),
                          weight=self.menu_weight)]
 
     def get_success_url(self, view=None):
