@@ -6,6 +6,8 @@ from .mixins import AdminTemplateMixin
 
 
 class AdminLoginView(AdminTemplateMixin, LoginView):
+    redirect_authenticated_user = True
+
     def get_success_url(self):
         url = self.get_redirect_url()
         return url or reverse_lazy('cbvadmin:dashboard')

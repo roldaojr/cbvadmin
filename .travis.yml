@@ -1,8 +1,19 @@
 language: python
 python:
+  - 3.4
   - 3.5
+  - 3.6
+env:
+  - DJANGO='django>=2.0,<2.1'
+  - DJANGO='https://github.com/django/django/archive/master.tar.gz'
 install:
-  - pip install -r requirements.txt
+  - make install
 script:
-  - python manage.py check
-  - python manage.py test
+  - make test
+notifications:
+  email: false
+matrix:
+  allow_failures:
+    - env: DJANGO='https://github.com/django/django/archive/master.tar.gz'
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
