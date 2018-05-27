@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='CBVadmin',
-    version='0.3.0a1',
+    version='0.3.0a2',
     description='Drop-in replacement of Django admin using Class Based Views',
     long_description=open('README.rst').read(),
     classifiers=[

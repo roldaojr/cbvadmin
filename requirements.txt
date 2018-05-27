@@ -1,6 +1,6 @@
-Django>=1.11
-crispy-semantic-ui>=1.0
-django-crispy-forms>=1.6
-django-filter>=1.0
-django-simple-menu>=1.2
-django-tables2>=1.5
+Django==2.0.4
+crispy-semantic-ui==1.0.2
+django-crispy-forms==1.6.0
+django-filter==1.0.0
+django-simple-menu==1.2.1
+django-tables2==1.5.0
