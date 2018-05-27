@@ -12,7 +12,7 @@
 {% endfor %}
     </div>
   </div>
-{% else %}
+{% elif item.url %}
   <a class="item" {% if item.url %}href="{{ item.url }}"{% endif %}>
     {% if item.icon %}<i class="{{ item.icon }} icon"></i>{% endif %}
     {{ item.title }}
