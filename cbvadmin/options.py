@@ -87,6 +87,7 @@ class ModelAdmin(BaseAdmin):
     form_class = None
     # menu item optionns
     menu_weight = 50
+    menu_icon = None
 
     def __init__(self, model_class):
         self.model_class = model_class
@@ -170,7 +171,7 @@ class ModelAdmin(BaseAdmin):
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
                          reverse(self.urls['default']),
                          check=lambda request: request.user.has_perm(code),
-                         weight=self.menu_weight)]
+                         weight=self.menu_weight, icon=self.menu_icon)]
 
     def get_success_url(self, view=None):
         return reverse(self.urls['default'])

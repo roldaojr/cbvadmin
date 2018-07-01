@@ -10,8 +10,8 @@ def get_setting(key, default=None):
 
 def menu_generator(app_label, items):
     app_config = apps.get_app_config(app_label)
-    app_title = app_config.verbose_name
     weight = getattr(app_config, 'menu_weight', 50)
+    icon = getattr(app_config, 'menu_icon', None)
     menu_items = []
     submenu_items = defaultdict(list)
     for item in items:
@@ -21,9 +21,9 @@ def menu_generator(app_label, items):
             elif item.submenu is False:
                 menu_items.append(item)
         else:
-            submenu_items[app_title].append(item)
+            submenu_items[app_config.verbose_name].append(item)
 
     return menu_items + [
-        MenuItem(app_title, '', children=subitems, weight=weight)
-        for app_title, subitems in submenu_items.items()
+        MenuItem(menu_title, '', children=subitems, weight=weight, icon=icon)
+        for menu_title, subitems in submenu_items.items()
     ]
