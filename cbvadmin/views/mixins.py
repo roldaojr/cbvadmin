@@ -231,11 +231,9 @@ class SuccessMixin(SuccessMessageMixin):
 
     def get_success_message(self, cleaned_data):
         if self.success_message:
-            return self.success_message % dict(
-                cleaned_data,
-                _verbose_name=self.model._meta.verbose_name.title())
-        else:
-            return 'Success'
+            return self.success_message.format(
+                name=self.model._meta.verbose_name.title(),
+                obj=self.object)
 
     def get_success_url(self):
         return self.admin.get_success_url(view=self)
