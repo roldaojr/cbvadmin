@@ -1,8 +1,7 @@
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = 'ya3u!z@!eucn+7&f@-ug79qtdpo)wyetyrmt$4xh5)azlpib1g'
-DEBUG = True
-ALLOWED_HOSTS = []
+
+BASE_DIR = os.path.dirname(__file__)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -10,13 +9,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cbvadmin',
-    'semantic_ui',
-    'crispy_forms',
-    'django_tables2',
-    'django_filters',
-    'menu',
-    'demo.app'
+    'cbvadmin'
 ]
 
 MIDDLEWARE = [
@@ -29,12 +22,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'demo.urls'
+ROOT_URLCONF = 'cbvadmin.tests.urls'
+SECRET_KEY = 'secretkey'
 
+TEMPLATE_DEBUG = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -47,27 +42,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'demo.wsgi.application'
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': ':memory:'
     }
 }
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-STATIC_URL = '/static/'
-
-CBVADMIN_THEME = 'semantic-ui'
-CRISPY_ALLOWED_TEMPLATE_PACKS = ('semantic-ui',)
-CRISPY_TEMPLATE_PACK = 'semantic-ui'

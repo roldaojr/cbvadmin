@@ -14,6 +14,16 @@ from .views.auth import (AdminLoginView, AdminLogoutView,
 
 class DefaultAdmin(SimpleAdmin):
     dashboard_view_class = Dashboard
+    default_action = 'dashboard'
+
+    def get_actions(self):
+        return {'dashboard': 'collection'}
+
+    def get_menu(self):
+        return [MenuItem('Dashboard', reverse('cbvadmin:dashboard'))]
+
+
+class AccountsAdmin(SimpleAdmin):
     login_view_class = AdminLoginView
     logout_view_class = AdminLogoutView
     password_change_view_class = PasswordChange
@@ -22,11 +32,8 @@ class DefaultAdmin(SimpleAdmin):
     password_reset_confirm_view_class = AdminPasswordResetConfirmView
     password_reset_complete_view_class = AdminPasswordResetCompleteView
 
-    default_action = 'dashboard'
-
     def get_actions(self):
         return {
-            'dashboard': 'collection',
             'login': 'collection',
             'logout': 'collection',
             'password_change': 'collection',
@@ -37,10 +44,11 @@ class DefaultAdmin(SimpleAdmin):
         }
 
     def get_menu(self):
-        return [MenuItem('Dashboard', reverse('cbvadmin:dashboard'))]
+        return None
 
 
 site.register('default', DefaultAdmin)
+site.register('accounts', AccountsAdmin)
 
 
 if settings.AUTH_USER_MODEL == 'auth.User' and \

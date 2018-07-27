@@ -1,8 +1,13 @@
+import re
 from setuptools import setup
+
+# get version without importing
+with open('cbvadmin/__init__.py', 'rb') as f:
+    VERSION = str(re.search('__version__ = \'(.+?)\'', f.read().decode('utf-8')).group(1))
 
 setup(
     name='CBVadmin',
-    version='0.3.0a2',
+    version=VERSION,
     description='Drop-in replacement of Django admin using Class Based Views',
     long_description=open('README.rst').read(),
     classifiers=[

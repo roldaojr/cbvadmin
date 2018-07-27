@@ -42,37 +42,47 @@ class StrictField(Field):
     template = "%s/field.strict.html"
 
 
-def instance_getter(self):
-    return getattr(self.form.instance, self.name, None)
-
-
 class StaticField(Field):
     template = "%s/field.static.html"
 
-    def __init__(self, *args, **kwargs):
-        self._filter_func = kwargs.pop('filter_func', None)
-        super(StaticField, self).__init__(*args, **kwargs)
+    def __init__(self, *args, format=None, **kwargs):
+        self.format = format
+        super().__init__(*args, **kwargs)
 
-    def _lookup_field(self, field_name, form):
-        try:
-            return valuefield_for_formfield(
-                form[field_name], filter_func=self._filter_func)
-        except KeyError:
-            return ValueField(form.instance, field_name,
-                              filter_func=self._filter_func)
-
-    def render_field(self, field, context, template):
+    def render_static_field(self, field, form, form_style, context, **kwargs):
+        template = self.get_template_name(kwargs.get('template_pack'))
         attrs = self.attrs
+
+        if form and field in form.fields:
+            value = form[field].value
+        else:
+            value = getattr(form.instance, field, None)
+
+        text = getattr(form.instance, field, None)
+        if callable(self.format):
+            text = self.format(text)
+
+        field = {
+            'auto_id': field,
+            'name': field,
+            'value': value,
+            'text': text,
+            'form': form
+        }
+
         context.update({
             'wrapper_class': self.wrapper_class,
             'field': field,
             'flat_attrs': flatatt(attrs if isinstance(attrs, dict) else {}),
         })
-        return render_to_string(template, context)
 
-    def render(self, form, form_style, context, *args, **kwargs):
-        fields = [self._lookup_field(field, form) for field in self.fields]
-        template = self.get_template_name(kwargs.get('template_pack'))
-        context.update(kwargs.get('extra_context', {}))
-        return ''.join(self.render_field(field, context, template)
-                       for field in fields)
+        if kwargs.get('extra_context') is not None:
+            context.update(kwargs.get('extra_context'))
+
+        return render_to_string(template, context.flatten())
+
+    def render(self, *args, **kwargs):
+        return ''.join(
+            self.render_static_field(field, *args, **kwargs)
+            for field in self.fields
+        )

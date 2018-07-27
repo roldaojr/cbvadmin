@@ -1,5 +1,4 @@
 import inspect
-import six
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -177,8 +176,8 @@ class PermissionRequiredMixin(AccessMixin):
 
 class AdminTemplateMixin(object):
     def get_admin_template(self, name):
-        theme = get_setting('theme', 'materialize')
-        return 'cbvadmin/%s/%s' % (theme, name)
+        template_pack = get_setting('TEMPLATE_PACK')
+        return 'cbvadmin/%s/%s' % (template_pack, name)
 
     def get_template_names(self, *args, **kwargs):
         template_names = super(
@@ -186,12 +185,15 @@ class AdminTemplateMixin(object):
         default_template = getattr(self, 'default_template', None)
         if default_template:
             template_names.append(default_template)
-        theme = get_setting('theme', 'materialize')
         admin_templates = ['cbvadmin/%s' % t for t in
                            reversed(template_names)]
-        theme_templates = ['cbvadmin/%s/%s' % (theme, t) for t in
-                           reversed(template_names)]
-        return admin_templates + theme_templates
+        template_pack = get_setting('TEMPLATE_PACK', '')
+        if template_pack:
+            ui_templates = ['cbvadmin/%s/%s' % (template_pack, t) for t in
+                            reversed(template_names)]
+        else:
+            ui_templates = []
+        return admin_templates + ui_templates
 
 
 class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
@@ -229,11 +231,9 @@ class SuccessMixin(SuccessMessageMixin):
 
     def get_success_message(self, cleaned_data):
         if self.success_message:
-            return self.success_message % dict(
-                cleaned_data,
-                _verbose_name=self.model._meta.verbose_name.title())
-        else:
-            return 'Success'
+            return self.success_message.format(
+                name=self.model._meta.verbose_name.title(),
+                obj=self.object)
 
     def get_success_url(self):
         return self.admin.get_success_url(view=self)

@@ -3,9 +3,11 @@
 *.py[co]
 __pycache__
 *.sqlite3
+.coverage
+.pytest*
 _private/
+.env
 media/
 staticfiles/
-.env
 build/
 dist/
