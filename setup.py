@@ -27,7 +27,7 @@ setup(
     author='roldaojr',
     author_email='roldaogjr@gmail.com',
     url='https://github.com/roldaojr/cbvadmin',
-    license='GPL',
+    license='LGPL',
     packages=['cbvadmin'],
     include_package_data=True,
     zip_safe=False,
