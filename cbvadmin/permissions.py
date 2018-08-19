@@ -16,7 +16,7 @@ def update_permissions(app_config, verbosity=2, interactive=True,
         view_codename = get_permission_codename('view', klass._meta)
         perm = (
             view_codename,
-            'Can view %s' % klass._meta.verbose_name_raw
+            'View %s' % klass._meta.verbose_name_raw
         )
         if view_codename not in [p[0] for p in klass._meta.permissions]:
             klass._meta.permissions += (perm,)
