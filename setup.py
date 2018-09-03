@@ -1,13 +1,10 @@
-import re
+import versioneer
 from setuptools import setup
 
-# get version without importing
-with open('cbvadmin/__init__.py', 'rb') as f:
-    VERSION = str(re.search('__version__ = \'(.+?)\'', f.read().decode('utf-8')).group(1))
-
 setup(
-    name='CBVadmin',
-    version=VERSION,
+    name='cbvadmin',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='Drop-in replacement of Django admin using Class Based Views',
     long_description=open('README.rst').read(),
     classifiers=[
