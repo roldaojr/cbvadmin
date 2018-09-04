@@ -6,7 +6,6 @@ __pycache__
 .coverage
 .pytest*
 _private/
-.env
 media/
 staticfiles/
 build/

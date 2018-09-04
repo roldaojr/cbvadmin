@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+coverage = "*"
+twine = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-django = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+test = "python -m pytest --cov=cbvadmin"
+full_test = "python -m pytest --cov=cbvadmin cbvadmin/tests"

@@ -7,9 +7,11 @@ env:
   - DJANGO='django>=2.0,<2.1'
   - DJANGO='https://github.com/django/django/archive/master.tar.gz'
 install:
-  - make install
+  - pip install pipenv
+  - pipenv install --system --deploy
+  - pip install -e .
 script:
-  - make test
+  - DJANGO_SETTINGS_MODULE=cbvadmin.tests.test_settings py.test cbvadmin/tests --cov=cbvadmin
 notifications:
   email: false
 matrix:
