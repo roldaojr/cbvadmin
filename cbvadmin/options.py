@@ -1,4 +1,3 @@
-import six
 from django.conf.urls import url
 from django.contrib.auth import get_permission_codename
 from django.urls import reverse
@@ -52,7 +51,7 @@ class SimpleAdmin(BaseAdmin):
         urls = []
         actions = self.get_actions()
 
-        for action, target in six.iteritems(actions):
+        for action, target in actions.items():
             if action == self.default_action:
                 pattern = r'^$'
             elif action == self.default_object_action:
@@ -128,7 +127,7 @@ class ModelAdmin(BaseAdmin):
         # get valid actions
         actions = self.get_actions()
 
-        for action, target in six.iteritems(actions):
+        for action, target in actions.items():
             if action == self.default_action:
                 pattern = r'^$'
             elif action == self.default_object_action:
@@ -153,7 +152,7 @@ class ModelAdmin(BaseAdmin):
         app = self.model_class._meta.app_label
         model = self.model_class._meta.model_name
         urls = {a: 'cbvadmin:%s_%s_%s' % (app, model, a)
-                for a, t in six.iteritems(self.get_actions())}
+                for a, t in self.get_actions().items()}
         urls['default'] = 'cbvadmin:%s_%s_%s' % (
             app, model, self.default_action)
         urls['default_object'] = 'cbvadmin:%s_%s_%s' % (
