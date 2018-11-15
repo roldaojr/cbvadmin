@@ -16,5 +16,5 @@ pytest-django = "*"
 python_version = "3.6"
 
 [scripts]
-test = "python -m pytest --cov=cbvadmin"
+test = "python -m pytest"
 full_test = "python -m pytest --cov=cbvadmin cbvadmin/tests"

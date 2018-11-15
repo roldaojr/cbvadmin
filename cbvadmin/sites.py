@@ -1,64 +1,71 @@
 from collections import defaultdict
-from django.conf.urls import url, include
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.urls import reverse
-from .utils import get_setting, menu_generator
+from django.conf.urls import path, include
+from django.apps import apps
+from menu import MenuItem
 
 
 class AdminSite(object):
-    _registry = {}
-    _simple_registry = {}
-    _menu_registry = defaultdict(lambda: menu_generator)
+    namespace = 'cbvadmin'
 
     def __init__(self):
-        self.name = get_setting('SITE_NAME', 'cbvadmin')
-        self.title = get_setting('SITE_TITLE', 'CBVAdmin')
+        self._registry = {}
+        self._menu_registry = {}
 
-    def register(self, model_class=None, admin_class=None):
-        admin = admin_class(model_class)
-        admin.site = self
-        if isinstance(model_class, str) or model_class is None:
-            self._simple_registry[model_class] = admin
+    def register(self, namespace=None, admin_class=None):
+        admin = admin_class(site=self, namespace=namespace)
+        self._registry[namespace] = admin
+
+    def register_menu(self, namespace, menu):
+        if isinstance(menu, MenuItem):
+            self._menu_registry[namespace] = menu
         else:
-            self._registry[model_class] = admin
+            raise ValueError('menu needs be a MenuItem isinstance')
 
-    def register_menu(self, app_label, menu_func):
-        self._menu_registry[app_label] = menu_func
+    def get_paths(self):
+        paths = []
+        for namespace, admin in self._registry.items():
+            path_prefix = admin.get_path_prefix()
+            if namespace == 'default':
+                path_prefix = ''
+            paths.append(path(
+                path_prefix,
+                include(admin.get_paths()),
+                namespace=admin.get_url_namespace()
+            ))
+        return paths
 
-    def get_urls(self):
-        urls = []
-        for name, admin in self._simple_registry.items():
-            if name == 'default':
-                urls.append(url('', include(admin.get_urls())))
-            else:
-                urls.append(url('%s/' % name, include(admin.get_urls())))
-        for model, admin in self._registry.items():
-            model_name = (model._meta.app_label,
-                          model._meta.model_name)
-            urls.append(url('%s/%s/' % model_name, include(admin.get_urls())))
-        return urls
+    def get_parent_menu(self, menu_name):
+        menu = self._menu_registry.get(menu_name, None)
+        if menu is not None:
+            return menu
+        try:
+            app_config = apps.get_app_config(menu_name)
+        except LookupError:
+            return None
+        return MenuItem(
+            app_config.verbose_name, '',
+            weight=getattr(app_config, 'menu_weight', 100),
+            icon=getattr(app_config, 'menu_icon', None))
 
     def get_menu(self):
+        admin_submenus = defaultdict(lambda: [])
+        for namespace, admin in self._registry.items():
+            for menu_item in admin.get_menu():
+                admin_submenus[menu_item.parent].append(menu_item)
+
         admin_menu = []
-        admin_sub_menus = defaultdict(lambda: [])
-        for name, admin in self._simple_registry.items():
-            items = admin.get_menu()
-            if items:
-                admin_menu += items
-
-        for model, admin in self._registry.items():
-            app_label = model._meta.app_label
-            sub_menu = admin.get_menu()
-            if sub_menu:
-                admin_sub_menus[app_label] += tuple(sub_menu)
-
-        for label, items in sorted(admin_sub_menus.items()):
-            admin_menu += self._menu_registry[label](label, items)
+        for menu_name, children in admin_submenus.items:
+            menu = self.get_parent_menu(menu_name)
+            if menu is not None:
+                menu.children = children
+                admin_menu.append(menu)
+            else:
+                admin_menu += children
         return admin_menu
 
     @property
     def urls(self):
-        return self.get_urls(), 'cbvadmin', self.name
+        return self.get_paths(), self.namespace, self.namespace
 
 
 site = AdminSite()

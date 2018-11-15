@@ -1,85 +1,93 @@
-from django.conf.urls import url
-from django.contrib.auth import get_permission_codename
+from functools import partial
 from django.urls import reverse
 from django.utils.functional import cached_property
 from menu import MenuItem
+from .actions import Action, ObjectAction
 from .tables import table_factory
 from .views.edit import AddView, EditView, DeleteView
 from .views.list import ListView
-from .views.user import PasswordReset
 
 
 class BaseAdmin(object):
     site = None
+    namespace = None
     default_action = None
     default_object_action = None
+    menu_weight = 50
+    menu_icon = None
 
     def __init__(self, *args, **kwargs):
-        for key in kwargs:
+        for key, value in kwargs.items():
             if hasattr(self, key):
-                setattr(self, key, kwargs[key])
+                setattr(self, key, value)
 
     def get_view_class(self, action):
         view_class = getattr(self, '%s_view_class' % action)
-        view_class.action = None
-        if view_class and not hasattr(view_class, 'admin'):
+        if view_class is not None:
+            view_class.action = None
             view_class.admin = None
         return view_class
 
     def get_view_kwargs(self, action):
-        """Return the view class custom kwargs to create view."""
-        return {}
+        return {'action': action, 'admin': self}
 
-    def get_actions_urls(self):
-        return {}
+    def get_view(self, action):
+        view_class = self.get_view_class(action)
+        view_kwargs = self.get_view_kwargs(action)
+        return view_class.as_view(**view_kwargs)
 
-    def get_actions(self):
-        return {}
+    def get_path_prefix(self):
+        return '%s/' % self.namespace
 
-    def get_urls(self):
+    def get_url_namespace(self):
+        return '%s:%s' % (self.site.namespace, self.namespace)
+
+    def _process_actions(self, actions):
+        _actions = []
+        for name, action_class in actions.items():
+            url_namespace = self.get_url_namespace(name)
+            action = action_class(
+                name=name,
+                view=self.get_view(name),
+                url_name='%s:%s' % (url_namespace, name)
+            )
+            _actions[name] = action
+            if action.name == self.default_object_action:
+                _actions['default_object'] = action
+            if action.name == self.default_action:
+                _actions['default'] = action
+        return _actions
+
+    def get_paths(self):
+        return [a.as_path() for a in self.actions.values()]
+
+    def get_menu(self):
         return []
 
     def has_permission(self, request, action, obj=None):
-        return True
+        return None
+
+    @cached_property
+    def actions(self):
+        _actions = self._process_actions(self.get_actions())
+        return _actions
 
 
 class SimpleAdmin(BaseAdmin):
-    def get_view_kwargs(self, action):
-        return {'action': action, 'admin': self}
-
-    def get_urls(self):
-        urls = []
-        actions = self.get_actions()
-
-        for action, target in actions.items():
-            if action == self.default_action:
-                pattern = r'^$'
-            elif action == self.default_object_action:
-                pattern = r'^(?P<pk>\d+)/$'
-            elif target == 'object':
-                pattern = r'^(?P<pk>\d+)/%s$' % action
-            elif action == 'password_reset_confirm':
-                pattern = r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$'
-            else:
-                pattern = r'^%s/$' % action
-
-            view_class = self.get_view_class(action)
-            view_kwargs = self.get_view_kwargs(action)
-            urls.append(url(pattern, view_class.as_view(**view_kwargs),
-                            name=action))
-        return urls
+    pass
 
 
 class ModelAdmin(BaseAdmin):
     default_action = 'list'
-    default_object_action = 'edit'
+    default_object_action = 'change'
+    model_class = None
     # list related options
     list_display = None
     list_display_links = None
-    list_view_class = ListView
     filterset_class = None
     filter_fields = None
-    # Add/Edit/Delte options
+    list_view_class = ListView
+    # Add/Edit/Deltee options
     add_view_class = AddView
     edit_view_class = EditView
     delete_view_class = DeleteView
@@ -88,95 +96,55 @@ class ModelAdmin(BaseAdmin):
     menu_weight = 50
     menu_icon = None
 
-    def __init__(self, model_class):
+    def __init__(self, *args, **kwargs):
+        model_class = kwargs.get('namespace')
         self.model_class = model_class
         self.model_opts = model_class._meta
-
-    def has_permission(self, request, action, obj=None):
-        # fix action for permission name
-        if action == 'edit':
-            action = 'change'
-        elif action in ('list', 'detail'):
-            action = 'view'
-
-        opts = self.model_class._meta
-        permission = '%s.%s' % (opts.app_label, get_permission_codename(
-            action, opts))
-        return request.user.has_perm(permission)
+        kwargs['namespace'] = '%s_%s' % (
+            self.model_class._meta.app_label,
+            self.model_class._meta.model_name)
+        super().__init__(*args, **kwargs)
 
     def get_table_class(self):
         return table_factory(self.model_class, self.list_display,
                              action=self.default_object_action)
 
     def get_form_class(self, request, obj=None, **kwargs):
-        """Return the form class to use."""
         return self.form_class
+
+    def get_view_kwargs(self, action):
+        kwargs = super().get_view_kwargs(action)
+        kwargs.update({'model': self.model_class})
+        return kwargs
 
     def get_actions(self):
         return {
-            'edit': 'object',
-            'delete': 'object',
-            'list': 'collection',
-            'add': 'collection'
+            'list': Action,
+            'add': Action,
+            'change': ObjectAction,
+            'delete': ObjectAction
         }
 
-    def get_urls(self):
-        app = self.model_class._meta.app_label
-        model = self.model_class._meta.model_name
-        urls = []
-        # get valid actions
-        actions = self.get_actions()
-
-        for action, target in actions.items():
-            if action == self.default_action:
-                pattern = r'^$'
-            elif action == self.default_object_action:
-                pattern = r'^(?P<pk>\d+)/$'
-            elif target == 'object':
-                pattern = r'^(?P<pk>\d+)/%s$' % action
-            else:
-                pattern = r'^%s$' % action
-
-            view_class = self.get_view_class(action)
-            view_kwargs = self.get_view_kwargs(action)
-            view_kwargs.update({
-                'model': self.model_class,
-                'action': action,
-                'admin': self,
-            })
-            urls.append(url(pattern, view_class.as_view(**view_kwargs),
-                            name='%s_%s_%s' % (app, model, action)))
-        return urls
-
-    def get_actions_urls(self):
-        app = self.model_class._meta.app_label
-        model = self.model_class._meta.model_name
-        urls = {a: 'cbvadmin:%s_%s_%s' % (app, model, a)
-                for a, t in self.get_actions().items()}
-        urls['default'] = 'cbvadmin:%s_%s_%s' % (
-            app, model, self.default_action)
-        urls['default_object'] = 'cbvadmin:%s_%s_%s' % (
-            app, model, self.default_object_action)
-        return urls
-
-    @cached_property
-    def urls(self):
-        return self.get_actions_urls()
+    def get_path_prefix(self):
+        return '%s/%s' % (
+            self.model_class._meta.app_label,
+            self.model_class._meta.model_name)
 
     def get_menu(self):
-        app = self.model_class._meta.app_label
-        model = self.model_class._meta.model_name
-        code = '%s.view_%s' % (app, model)
+        default_action = self.actions['default']
+        default_permission = partial(self.has_permission, default_action.name)
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
-                         reverse(self.urls['default']),
-                         check=lambda request: request.user.has_perm(code),
-                         weight=self.menu_weight, icon=self.menu_icon)]
+                         reverse(default_action.url_name),
+                         check=default_permission,
+                         parent=self.model_class._meta.app_label,
+                         weight=self.menu_weight,
+                         icon=self.menu_icon)]
 
-    def get_success_url(self, view=None):
-        return reverse(self.urls['default'])
+    def get_success_url(self, *args, **kwargs):
+        return reverse(self.actions['default'].url_name)
 
 
-class UserAdmin(ModelAdmin):
+'''class UserAdmin(ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'active')
     passwordreset_view_class = PasswordReset
 
@@ -206,3 +174,4 @@ class GroupAdmin(ModelAdmin):
     def get_form_class(self, request, obj=None, **kwargs):
         from .forms import GroupForm
         return GroupForm
+'''

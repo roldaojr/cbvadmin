@@ -1,10 +1,10 @@
-import inspect
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.mixins import (
+    AccessMixin,
+    LoginRequiredMixin as _LoginRequiredMixin,
+    PermissionRequiredMixin as _PermissionRequiredMixin)
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http import (HttpResponse, StreamingHttpResponse)
 from django.utils.functional import cached_property
 from django_filters import CharFilter
 from django_filters.filterset import FilterSet
@@ -37,141 +37,29 @@ def filterset_factory(model, fields):
     return filterset
 
 
-class AccessMixin(object):
-    """
-    'Abstract' mixin that gives access mixins the same customizable
-    functionality.
-    """
-    login_url = None
-    raise_exception = False
-    redirect_field_name = REDIRECT_FIELD_NAME  # Set by django.contrib.auth
-    redirect_unauthenticated_users = False
-
+class AdminAccessMixin(object):
     def get_login_url(self):
         return reverse('cbvadmin:login')
 
-    def get_redirect_field_name(self):
-        """
-        Override this method to customize the redirect_field_name.
-        """
-        if self.redirect_field_name is None:
-            raise ImproperlyConfigured(
-                '{0} is missing the '
-                'redirect_field_name. Define {0}.redirect_field_name or '
-                'override {0}.get_redirect_field_name().'.format(
-                    self.__class__.__name__))
-        return self.redirect_field_name
 
-    def handle_no_permission(self, request):
-        if self.raise_exception:
-            if (self.redirect_unauthenticated_users and
-                    not request.user.is_authenticated):
-                return self.no_permissions_fail(request)
-            else:
-                if (inspect.isclass(self.raise_exception) and
-                        issubclass(self.raise_exception, Exception)):
-                    raise self.raise_exception
-                if callable(self.raise_exception):
-                    ret = self.raise_exception(request)
-                    if isinstance(ret, (HttpResponse, StreamingHttpResponse)):
-                        return ret
-                raise PermissionDenied
-
-        return self.no_permissions_fail(request)
-
-    def no_permissions_fail(self, request=None):
-        """
-        Called when the user has no permissions and no exception was raised.
-        This should only return a valid HTTP response.
-
-        By default we redirect to login.
-        """
-        from django.contrib.auth.views import redirect_to_login
-        return redirect_to_login(request.get_full_path(),
-                                 self.get_login_url(),
-                                 self.get_redirect_field_name())
+class LoginRequiredMixin(AdminAccessMixin, _LoginRequiredMixin):
+    pass
 
 
-class LoginRequiredMixin(AccessMixin):
-    """
-    View mixin which verifies that the user is authenticated.
-
-    NOTE:
-        This should be the left-most mixin of a view, except when
-        combined with CsrfExemptMixin - which in that case should
-        be the left-most mixin.
-    """
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission(request)
-
-        return super(LoginRequiredMixin, self).dispatch(
-            request, *args, **kwargs)
-
-
-class PermissionRequiredMixin(AccessMixin):
-    """
-    View mixin which verifies that the logged in user has the specified
-    permission.
-    Class Settings
-    `permission_required` - the permission to check for.
-    `login_url` - the login url of site
-    `redirect_field_name` - defaults to "next"
-    `raise_exception` - defaults to False - raise 403 if set to True
-    Example Usage
-        class SomeView(PermissionRequiredMixin, ListView):
-            ...
-            # required
-            permission_required = "app.permission"
-            # optional
-            login_url = "/signup/"
-            redirect_field_name = "hollaback"
-            raise_exception = True
-            ...
-    """
-    permission_required = None  # Default required perms to none
-    raise_exception = True
-
-    def get_permission_required(self, request=None):
-        """
-        Get the required permissions and return them.
-        Override this to allow for custom permission_required values.
-        """
-        # Make sure that the permission_required attribute is set on the
-        # view, or raise a configuration error.
-        if self.permission_required is None:
-            raise ImproperlyConfigured(
-                '{0} requires the "permission_required" attribute to be '
-                'set.'.format(self.__class__.__name__))
-
-        return self.permission_required
-
-    def check_permissions(self, request):
-        """
-        Returns whether or not the user has permissions
-        """
+class PermissionRequiredMixin(AdminAccessMixin, _PermissionRequiredMixin):
+    def has_permission(self):
         if self.admin:
             try:
                 obj = self.get_object()
             except AttributeError:
                 obj = None
-            return self.admin.has_permission(request, self.action, obj)
+            has_perm = self.admin.has_permission(
+                self.request, self.action, obj)
+            if has_perm is not None:
+                return has_perm
 
-        perms = self.get_permission_required(request)
-        return request.user.has_perm(perms)
-
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Check to see if the user in the request has the required
-        permission.
-        """
-        has_permission = self.check_permissions(request)
-
-        if not has_permission:
-            return self.handle_no_permission(request)
-
-        return super(PermissionRequiredMixin, self).dispatch(
-            request, *args, **kwargs)
+        perms = self.get_permission_required()
+        return self.request.user.has_perm(perms)
 
 
 class AdminTemplateMixin(object):
