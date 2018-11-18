@@ -1,5 +1,5 @@
 from collections import defaultdict
-from django.conf.urls import path, include
+from django.urls import include, path
 from django.apps import apps
 from menu import MenuItem
 
@@ -15,23 +15,14 @@ class AdminSite(object):
         admin = admin_class(site=self, namespace=namespace)
         self._registry[namespace] = admin
 
-    def register_menu(self, namespace, menu):
-        if isinstance(menu, MenuItem):
-            self._menu_registry[namespace] = menu
-        else:
-            raise ValueError('menu needs be a MenuItem isinstance')
-
-    def get_paths(self):
+    def get_urls(self):
         paths = []
         for namespace, admin in self._registry.items():
             path_prefix = admin.get_path_prefix()
             if namespace == 'default':
                 path_prefix = ''
-            paths.append(path(
-                path_prefix,
-                include(admin.get_paths()),
-                namespace=admin.get_url_namespace()
-            ))
+            paths.append(path(path_prefix, include(
+                admin.get_urls())))
         return paths
 
     def get_parent_menu(self, menu_name):
@@ -65,7 +56,7 @@ class AdminSite(object):
 
     @property
     def urls(self):
-        return self.get_paths(), self.namespace, self.namespace
+        return self.get_urls(), 'cbvadmin', self.namespace
 
 
 site = AdminSite()

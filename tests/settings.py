@@ -22,7 +22,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'cbvadmin.tests.urls'
+ROOT_URLCONF = 'tests.urls'
 SECRET_KEY = 'secretkey'
 
 TEMPLATE_DEBUG = True

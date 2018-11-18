@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 from menu import MenuItem
 from .sites import site
-from .options import SimpleAdmin, UserAdmin, GroupAdmin
+from .options import SimpleAdmin
 from .views.dashboard import Dashboard
 from .views.user import PasswordChange
 from .views.auth import (AdminLoginView, AdminLogoutView,
@@ -51,8 +51,8 @@ site.register('default', DefaultAdmin)
 site.register('accounts', AccountsAdmin)
 
 
-if settings.AUTH_USER_MODEL == 'auth.User' and \
-   getattr(settings, 'CBVADMIN_REGISTER_USER', True):
-    from django.contrib.auth.models import User, Group
-    site.register(User, UserAdmin)
-    site.register(Group, GroupAdmin)
+#if settings.AUTH_USER_MODEL == 'auth.User' and \
+#   getattr(settings, 'CBVADMIN_REGISTER_USER', True):
+#    from django.contrib.auth.models import User, Group
+#    site.register(User, UserAdmin)
+#    site.register(Group, GroupAdmin)

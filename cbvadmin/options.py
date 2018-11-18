@@ -42,23 +42,30 @@ class BaseAdmin(object):
     def get_url_namespace(self):
         return '%s:%s' % (self.site.namespace, self.namespace)
 
+    def get_actions(self):
+        return {}
+
     def _process_actions(self, actions):
-        _actions = []
+        _actions = {}
         for name, action_class in actions.items():
-            url_namespace = self.get_url_namespace(name)
-            action = action_class(
-                name=name,
-                view=self.get_view(name),
-                url_name='%s:%s' % (url_namespace, name)
-            )
-            _actions[name] = action
-            if action.name == self.default_object_action:
+            url_name = '%s_%s' % (self.get_url_namespace(), name)
+            view = self.get_view(name)
+            if name == self.default_object_action:
+                action = action_class(name=name, view=view, path='<int:pk>/',
+                                      url_name=url_name)
+                _actions[name] = action
                 _actions['default_object'] = action
-            if action.name == self.default_action:
+            elif name == self.default_action:
+                action = action_class(name=name, view=view, path='',
+                                      url_name=url_name)
+                _actions[name] = action
                 _actions['default'] = action
+            else:
+                _actions[name] = action_class(name=name, view=view,
+                                              url_name=url_name)
         return _actions
 
-    def get_paths(self):
+    def get_urls(self):
         return [a.as_path() for a in self.actions.values()]
 
     def get_menu(self):
@@ -89,7 +96,7 @@ class ModelAdmin(BaseAdmin):
     list_view_class = ListView
     # Add/Edit/Deltee options
     add_view_class = AddView
-    edit_view_class = EditView
+    change_view_class = EditView
     delete_view_class = DeleteView
     form_class = None
     # menu item optionns
@@ -126,7 +133,7 @@ class ModelAdmin(BaseAdmin):
         }
 
     def get_path_prefix(self):
-        return '%s/%s' % (
+        return '%s/%s/' % (
             self.model_class._meta.app_label,
             self.model_class._meta.model_name)
 

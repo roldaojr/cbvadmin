@@ -2,8 +2,8 @@ from django.urls import path
 
 
 class Action(object):
-    def __init__(self, name, path=None, *args, **kwargs):
-        if not path:
+    def __init__(self, name, path=None, **kwargs):
+        if path is None:
             path = '%s/' % name
         self.name = name
         self.path = path
@@ -15,7 +15,7 @@ class Action(object):
 
 
 class ObjectAction(Action):
-    def __init__(self, name, path=None):
-        if not path:
+    def __init__(self, name, path=None, **kwargs):
+        if path is None:
             path = '<int:pk>/%s/' % name
-        return super().__init__(name, path)
+        return super().__init__(name, path, **kwargs)
