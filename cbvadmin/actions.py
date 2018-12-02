@@ -2,20 +2,24 @@ from django.urls import path
 
 
 class Action(object):
-    def __init__(self, name, path=None, **kwargs):
-        if path is None:
-            path = '%s/' % name
+    def __init__(self, name=None, path=None, **kwargs):
         self.name = name
         self.path = path
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def as_path(self):
-        return path(self.path, self.view, name=self.name)
+        if self.path is not None:
+            pattern = self.path
+        else:
+            pattern = '%s' % self.name
+        return path(pattern, self.view, name=self.name)
 
 
 class ObjectAction(Action):
-    def __init__(self, name, path=None, **kwargs):
-        if path is None:
-            path = '<int:pk>/%s/' % name
-        return super().__init__(name, path, **kwargs)
+    def as_path(self):
+        if self.path is not None:
+            pattern = self.path
+        else:
+            pattern = '<int:pk>/%s' % self.name
+        return path(pattern, self.view, name=self.name)

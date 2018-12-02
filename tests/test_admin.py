@@ -13,8 +13,8 @@ class SingleActionAdmin(SimpleAdmin):
 
     def get_actions(self):
         return {
-            'do': Action,
-            'aonther_do': Action
+            'do': Action(),
+            'aonther_do': Action()
         }
 
 
@@ -30,7 +30,7 @@ class AdminTestCase(TestCase):
         site = AdminSite()
         site.register('singleaction', SingleActionAdmin)
         sitepath = path('cbvadmin/', site.urls)
-        sitepath.resolve('cbvadmin/singleaction/do/')
+        sitepath.resolve('cbvadmin/singleaction/do')
         sitepath.resolve('cbvadmin/singleaction/')
 
 
@@ -52,6 +52,6 @@ class ModeAdminTestCase(TestCase):
         site.register(Group, ModelAdmin)
         sitepath = path('cbvadmin/', site.urls)
         sitepath.resolve('cbvadmin/auth/group/')
-        sitepath.resolve('cbvadmin/auth/group/add/')
-        sitepath.resolve('cbvadmin/auth/group/1/')
-        sitepath.resolve('cbvadmin/auth/group/1/delete/')
+        sitepath.resolve('cbvadmin/auth/group/add')
+        sitepath.resolve('cbvadmin/auth/group/1')
+        sitepath.resolve('cbvadmin/auth/group/1/delete')

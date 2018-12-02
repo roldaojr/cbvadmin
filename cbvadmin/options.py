@@ -39,6 +39,11 @@ class BaseAdmin(object):
     def get_path_prefix(self):
         return '%s/' % self.namespace
 
+    def get_perm_code(self, action):
+        return '%s_%s_%s' % (
+            self.model_class._meta.app_label, action,
+            self.model_class._meta.model_name)
+
     def get_url_namespace(self):
         return '%s:%s' % (self.site.namespace, self.namespace)
 
@@ -47,22 +52,19 @@ class BaseAdmin(object):
 
     def _process_actions(self, actions):
         _actions = {}
-        for name, action_class in actions.items():
-            url_name = '%s_%s' % (self.get_url_namespace(), name)
-            view = self.get_view(name)
+        for name, action in actions.items():
+            action.url_name = '%s_%s' % (self.get_url_namespace(), name)
+            action.view = self.get_view(name)
+            action.name = name
+            _actions[name] = action
+
             if name == self.default_object_action:
-                action = action_class(name=name, view=view, path='<int:pk>/',
-                                      url_name=url_name)
-                _actions[name] = action
+                action.path = '<int:pk>'
                 _actions['default_object'] = action
             elif name == self.default_action:
-                action = action_class(name=name, view=view, path='',
-                                      url_name=url_name)
-                _actions[name] = action
+                action.path = ''
                 _actions['default'] = action
-            else:
-                _actions[name] = action_class(name=name, view=view,
-                                              url_name=url_name)
+
         return _actions
 
     def get_urls(self):
@@ -71,7 +73,7 @@ class BaseAdmin(object):
     def get_menu(self):
         return []
 
-    def has_permission(self, request, action, obj=None):
+    def has_permission(self, action, **kwargs):
         return None
 
     @cached_property
@@ -126,10 +128,10 @@ class ModelAdmin(BaseAdmin):
 
     def get_actions(self):
         return {
-            'list': Action,
-            'add': Action,
-            'change': ObjectAction,
-            'delete': ObjectAction
+            'list': Action(perm='view'),
+            'add': Action(),
+            'change': ObjectAction(),
+            'delete': ObjectAction()
         }
 
     def get_path_prefix(self):
@@ -137,9 +139,21 @@ class ModelAdmin(BaseAdmin):
             self.model_class._meta.app_label,
             self.model_class._meta.model_name)
 
+    def get_perm_code(self, action):
+        perm_code = getattr(action, 'perm', None)
+        if perm_code is None:
+            perm_code = action.name
+        return '%s_%s_%s' % (
+            self.model_class._meta.app_label, perm_code,
+            self.model_class._meta.model_name)
+
+    def has_permission(self, request, action, **kwargs):
+        return request.usr.has_perm(self.get_perm_code(action))
+
     def get_menu(self):
         default_action = self.actions['default']
-        default_permission = partial(self.has_permission, default_action.name)
+        default_permission = partial(self.has_permission,
+                                     action=default_action)
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
                          reverse(default_action.url_name),
                          check=default_permission,
