@@ -1,6 +1,5 @@
-from django.conf import settings
-from django.urls import reverse
 from menu import MenuItem
+from .actions import Action
 from .sites import site
 from .options import SimpleAdmin
 from .views.dashboard import Dashboard
@@ -17,10 +16,10 @@ class DefaultAdmin(SimpleAdmin):
     default_action = 'dashboard'
 
     def get_actions(self):
-        return {'dashboard': 'collection'}
+        return {'dashboard': Action()}
 
     def get_menu(self):
-        return [MenuItem('Dashboard', reverse('cbvadmin:dashboard'))]
+        return [MenuItem('Dashboard', self.urls['dashboard'])]
 
 
 class AccountsAdmin(SimpleAdmin):
@@ -34,13 +33,13 @@ class AccountsAdmin(SimpleAdmin):
 
     def get_actions(self):
         return {
-            'login': 'collection',
-            'logout': 'collection',
-            'password_change': 'collection',
-            'password_reset': 'collection',
-            'password_reset_done': 'collection',
-            'password_reset_confirm': 'collection',
-            'password_reset_complete': 'collection'
+            'login': Action(),
+            'logout': Action(),
+            'password_change': Action(),
+            'password_reset': Action(),
+            'password_reset_done': Action(),
+            'password_reset_confirm': Action(),
+            'password_reset_complete': Action()
         }
 
     def get_menu(self):

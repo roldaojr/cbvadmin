@@ -1,12 +1,19 @@
-from django.urls import path
+from django.urls import path, reverse
 
 
 class Action(object):
-    def __init__(self, name=None, path=None, **kwargs):
-        self.name = name
-        self.path = path
+    name = None
+    path = None
+    view = None
+    perm = None
+    admin = None
+    view_class = None
+
+    def __init__(self, view_class=None, **kwargs):
+        self.view_class = view_class
         for key, value in kwargs.items():
-            setattr(self, key, value)
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def as_path(self):
         if self.path is not None:

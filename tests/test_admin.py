@@ -7,8 +7,7 @@ from cbvadmin.sites import AdminSite
 
 
 class SingleActionAdmin(SimpleAdmin):
-    do_view_class = View
-    aonther_do_view_class = View
+    view_classes = {'do': View, 'aonther_do': View}
     default_action = 'aonther_do'
 
     def get_actions(self):
