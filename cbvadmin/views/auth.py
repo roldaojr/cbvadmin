@@ -14,12 +14,14 @@ class AdminLoginView(AdminTemplateMixin, LoginView):
 
 
 class AdminLogoutView(AdminTemplateMixin, LogoutView):
-    next_page = reverse_lazy('cbvadmin:login')
+    next_page = reverse_lazy('cbvadmin:accounts:login')
 
 
 class AdminPasswordResetView(AdminTemplateMixin, PasswordResetView):
-    success_url = reverse_lazy('cbvadmin:password_reset_done')
     email_template_name = 'cbvadmin/semantic-ui/registration/password_reset_email.html'
+
+    def get_success_url(self):
+        return reverse_lazy(self.admin.urls['password_reset_done'])
 
 
 class AdminPasswordResetDoneView(AdminTemplateMixin, PasswordResetDoneView):
@@ -28,7 +30,8 @@ class AdminPasswordResetDoneView(AdminTemplateMixin, PasswordResetDoneView):
 
 class AdminPasswordResetConfirmView(AdminTemplateMixin,
                                     PasswordResetConfirmView):
-    success_url = reverse_lazy('cbvadmin:password_reset_complete')
+    def get_success_url(self):
+        return reverse_lazy(self.admin.urls['password_reset_complete'])
 
 
 class AdminPasswordResetCompleteView(AdminTemplateMixin,
