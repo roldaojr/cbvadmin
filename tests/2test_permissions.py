@@ -31,8 +31,8 @@ class StaffUserTestCase(TestCase):
 class PermissionTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(username='user', password='user')
-        perms_map = {'list': 'view', 'edit': 'change'}
-        for action in ('list', 'edit', 'add', 'delete'):
+        perms_map = {'list': 'view'}
+        for action in ('list', 'change', 'add', 'delete'):
             user = User.objects.create_user(username='user_%s' % action,
                                             password='user_%s' % action)
             codename = '%s_user' % perms_map.get(action, action)
@@ -65,14 +65,14 @@ class PermissionTestCase(TestCase):
         self.assertEqual(resp.status_code, 403)
 
     def test_admin_edit_allowed(self):
-        self.client.login(username='user_edit', password='user_edit')
-        url = reverse('cbvadmin:auth_user_edit', kwargs={'pk': 1})
+        self.client.login(username='user_change', password='user_change')
+        url = reverse('cbvadmin:auth_user_change', kwargs={'pk': 1})
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
     def test_user_edit_denied(self):
         self.client.login(username='user', password='user')
-        url = reverse('cbvadmin:auth_user_edit', kwargs={'pk': 1})
+        url = reverse('cbvadmin:auth_user_change', kwargs={'pk': 1})
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 403)
 

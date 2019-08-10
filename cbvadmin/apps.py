@@ -4,7 +4,6 @@ from django.core import checks
 from django.db.models.signals import post_migrate
 from django.utils.module_loading import autodiscover_modules
 from .sites import site
-from .permissions import update_permissions
 from .checks import check_cbvadmin_app
 
 
@@ -13,9 +12,6 @@ class CBVAdminConfig(AppConfig):
 
     def ready(self):
         super(CBVAdminConfig, self).ready()
-        post_migrate.connect(
-            update_permissions,
-            dispatch_uid='cbvadmin.permissions.update_permissions')
         # Add checks
         checks.register(check_cbvadmin_app, 'cbvadmin')
         # Autodiscover cbvadmin modules

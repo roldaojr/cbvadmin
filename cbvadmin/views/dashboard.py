@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from django.db.models.base import ModelBase
 from .mixins import AdminTemplateMixin, LoginRequiredMixin
 
 
@@ -10,8 +11,9 @@ class Dashboard(AdminTemplateMixin, LoginRequiredMixin, TemplateView):
         context = super(Dashboard, self).get_context_data(*args, **kwargs)
         counters = []
         for model_class in self.admin.site._registry.keys():
-            name = model_class._meta.verbose_name_plural
-            value = model_class.objects.count()
-            counters.append({'name': name, 'value': value})
+            if type(model_class) != str:
+                name = model_class._meta.verbose_name_plural
+                value = model_class.objects.count()
+                counters.append({'name': name, 'value': value})
         context['counters'] = counters
         return context

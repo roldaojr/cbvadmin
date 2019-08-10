@@ -12,18 +12,16 @@ class AdminSite(object):
         self._menu_registry = {}
 
     def register(self, namespace=None, admin_class=None):
-        admin = admin_class(site=self, namespace=namespace)
+        admin = admin_class(namespace, site=self)
         self._registry[namespace] = admin
 
     def get_urls(self):
-        paths = []
-        for namespace, admin in self._registry.items():
+        urls = []
+        for admin in self._registry.values():
             path_prefix = admin.get_path_prefix()
-            if namespace == 'default':
-                path_prefix = ''
-            paths.append(path(path_prefix, include(
+            urls.append(path(path_prefix, include(
                 admin.get_urls())))
-        return paths
+        return urls
 
     def get_parent_menu(self, menu_name):
         menu = self._menu_registry.get(menu_name, None)
@@ -40,12 +38,14 @@ class AdminSite(object):
 
     def get_menu(self):
         admin_submenus = defaultdict(lambda: [])
-        for namespace, admin in self._registry.items():
-            for menu_item in admin.get_menu():
-                admin_submenus[menu_item.parent].append(menu_item)
+        for _, admin in self._registry.items():
+            menu_items = admin.get_menu()
+            if menu_items is not None:
+                for menu_item in menu_items:
+                    admin_submenus[menu_item.parent].append(menu_item)
 
         admin_menu = []
-        for menu_name, children in admin_submenus.items:
+        for menu_name, children in admin_submenus.items():
             menu = self.get_parent_menu(menu_name)
             if menu is not None:
                 menu.children = children

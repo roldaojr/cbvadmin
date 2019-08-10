@@ -1,3 +1,4 @@
+from django.urls import reverse
 from menu import MenuItem
 from .actions import Action
 from .sites import site
@@ -12,41 +13,29 @@ from .views.auth import (AdminLoginView, AdminLogoutView,
 
 
 class DefaultAdmin(SimpleAdmin):
-    dashboard_view_class = Dashboard
     default_action = 'dashboard'
-
-    def get_actions(self):
-        return {'dashboard': Action()}
+    actions = {'dashboard': Action(Dashboard, default=True)}
 
     def get_menu(self):
-        return [MenuItem('Dashboard', self.urls['dashboard'])]
+        return [MenuItem('Dashboard', reverse(self.urls['dashboard']))]
 
 
 class AccountsAdmin(SimpleAdmin):
-    login_view_class = AdminLoginView
-    logout_view_class = AdminLogoutView
-    password_change_view_class = PasswordChange
-    password_reset_view_class = AdminPasswordResetView
-    password_reset_done_view_class = AdminPasswordResetDoneView
-    password_reset_confirm_view_class = AdminPasswordResetConfirmView
-    password_reset_complete_view_class = AdminPasswordResetCompleteView
-
-    def get_actions(self):
-        return {
-            'login': Action(),
-            'logout': Action(),
-            'password_change': Action(),
-            'password_reset': Action(),
-            'password_reset_done': Action(),
-            'password_reset_confirm': Action(),
-            'password_reset_complete': Action()
-        }
+    actions = {
+        'login': Action(AdminLoginView),
+        'logout': Action(AdminLogoutView),
+        'password_change': Action(PasswordChange),
+        'password_reset': Action(AdminPasswordResetView),
+        'password_reset_done': Action(AdminPasswordResetDoneView),
+        'password_reset_confirm': Action(AdminPasswordResetConfirmView),
+        'password_reset_complete': Action(AdminPasswordResetCompleteView)
+    }
 
     def get_menu(self):
         return None
 
 
-site.register('default', DefaultAdmin)
+site.register('', DefaultAdmin)
 site.register('accounts', AccountsAdmin)
 
 

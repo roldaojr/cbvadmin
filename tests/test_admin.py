@@ -7,23 +7,19 @@ from cbvadmin.sites import AdminSite
 
 
 class SingleActionAdmin(SimpleAdmin):
-    view_classes = {'do': View, 'aonther_do': View}
-    default_action = 'aonther_do'
-
-    def get_actions(self):
-        return {
-            'do': Action(),
-            'aonther_do': Action()
-        }
+    actions = {
+        'do': Action(View),
+        'aonther_do': Action(View, default=True)
+    }
 
 
 class AdminTestCase(TestCase):
     def test_simple_admin(self):
         admin = SingleActionAdmin(site=AdminSite(), namespace='singleaction')
         self.assertEqual(admin.get_path_prefix(), 'singleaction/')
-        self.assertEqual(admin.get_url_namespace(), 'cbvadmin:singleaction')
+        self.assertEqual(admin.get_url_name(), 'cbvadmin:singleaction')
         self.assertEqual(
-            admin.actions['do'].url_name, 'cbvadmin:singleaction_do')
+            admin.bound_actions['do'].url_name, 'cbvadmin:singleaction:do')
 
     def test_admin_site_url(self):
         site = AdminSite()
@@ -36,13 +32,13 @@ class AdminTestCase(TestCase):
 class ModeAdminTestCase(TestCase):
     def test_model_admin(self):
         from django.contrib.auth.models import User
-        admin = ModelAdmin(site=AdminSite(), namespace=User)
+        admin = ModelAdmin(site=AdminSite(), model_class=User)
         self.assertEqual(admin.get_path_prefix(), 'auth/user/')
-        self.assertEqual(admin.get_url_namespace(), 'cbvadmin:auth_user')
+        self.assertEqual(admin.get_url_name(), 'cbvadmin:auth_user')
         for action in ['list', 'add', 'change', 'delete']:
             self.assertEqual(
-                admin.actions[action].url_name,
-                'cbvadmin:auth_user_%s' % action)
+                admin.bound_actions[action].url_name,
+                'cbvadmin:auth_user:%s' % action)
 
     def test_admin_site_url(self):
         from django.contrib.auth.models import Group

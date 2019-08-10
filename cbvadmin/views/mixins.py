@@ -92,7 +92,7 @@ class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
         context = super(AdminMixin, self).get_context_data(**kwargs)
         admin_perms = {
             action: self.admin.has_permission(self.request, action)
-            for action in self.admin.get_actions().keys()
+            for action in self.admin.actions.keys()
         }
         admin_perms.update({
             'default': self.admin.has_permission(
@@ -102,7 +102,7 @@ class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
         })
         admin_urls = {
             action: url
-            for action, url in self.admin.get_actions_urls().items()
+            for action, url in self.admin.urls.items()
             if admin_perms[action]
         }
         context.update({
