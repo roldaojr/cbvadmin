@@ -39,7 +39,7 @@ def filterset_factory(model, fields):
 
 class AdminAccessMixin(object):
     def get_login_url(self):
-        return reverse('cbvadmin:login')
+        return reverse('cbvadmin:accounts:login')
 
 
 class LoginRequiredMixin(AdminAccessMixin, _LoginRequiredMixin):

@@ -1,4 +1,4 @@
-from django.views.generic.list import DetailView as BaseDetailView
+from django.views.generic.detail import DetailView as BaseDetailView
 from .mixins import AdminMixin, PermissionRequiredMixin
 
 
