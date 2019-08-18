@@ -16,3 +16,4 @@ class CBVAdminConfig(AppConfig):
         checks.register(check_cbvadmin_app, 'cbvadmin')
         # Autodiscover cbvadmin modules
         autodiscover_modules('cbvadmin', register_to=site)
+        autodiscover_modules('admin', register_to=site)
