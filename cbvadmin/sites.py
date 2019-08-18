@@ -15,6 +15,9 @@ class AdminSite(object):
         admin = admin_class(namespace, site=self)
         self._registry[namespace] = admin
 
+    def register_menu(self, name, menuitem):
+        self._menu_registry[name] = menuitem
+
     def get_urls(self):
         urls = []
         for admin in self._registry.values():
