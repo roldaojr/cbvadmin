@@ -35,8 +35,10 @@ class AccountsAdmin(SimpleAdmin):
         return None
 
 
-site.register('', DefaultAdmin)
-site.register('accounts', AccountsAdmin)
+if '' not in site._registry:
+    site.register('', DefaultAdmin)
+if 'accounts' not in site._registry:
+    site.register('accounts', AccountsAdmin)
 
 
 #if settings.AUTH_USER_MODEL == 'auth.User' and \
