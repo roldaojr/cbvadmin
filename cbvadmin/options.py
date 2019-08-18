@@ -49,6 +49,9 @@ class BaseAdmin(object):
     def get_permisson(self, action, **kwargs):
         return self.permissions.get(action, None)
 
+    def has_permission(self, request, action):
+        return True
+
     def get_url_name(self, action=None):
         namespace = [self.site.namespace]
         if self.namespace:
@@ -180,4 +183,5 @@ class ModelAdmin(BaseAdmin):
                          icon=self.menu_icon)]
 
     def get_success_url(self, *args, **kwargs):
-        return reverse(self.urls['default'])
+        action = self.get_default_action()
+        return reverse(self.urls[action.name])
