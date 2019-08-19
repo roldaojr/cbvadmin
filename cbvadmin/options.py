@@ -134,9 +134,9 @@ class ModelAdmin(BaseAdmin):
         super().__init__(namespace, *args, **kwargs)
 
     def get_table_class(self):
-        item_action = self.get_default_action(item=True)
+        action_url = self.get_url_name(self.get_default_action(item=True))
         return table_factory(self.model_class, self.list_display,
-                             action=item_action)
+                             action=action_url)
 
     def get_form_class(self, request, obj=None, **kwargs):
         return self.form_class
