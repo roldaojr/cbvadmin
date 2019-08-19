@@ -90,27 +90,20 @@ class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
 
     def get_context_data(self, **kwargs):
         context = super(AdminMixin, self).get_context_data(**kwargs)
-        admin_perms = {
-            action: self.admin.has_permission(self.request, action)
-            for action in self.admin.actions.keys()
-        }
-        admin_perms.update({
-            'default': self.admin.has_permission(
-                self.request, self.admin.default_action),
-            'default_object': self.admin.has_permission(
-                self.request, self.admin.default_object_action)
-        })
-        admin_urls = {
-            action: url
-            for action, url in self.admin.urls.items()
-            if admin_perms[action]
-        }
-        context.update({
-            'admin': {
-                'perms': admin_perms,
-                'urls': admin_urls
-            }
-        })
+        perms = {}
+        urls = {}
+        for name, action in self.admin.bound_actions.items():
+            perms[name] = self.admin.has_permission(self.request, name)
+            default_key = 'default_object' if action.item else 'default'
+            if action.default:
+                perms[default_key] = perms[name]
+
+            if perms[name]:
+                urls[name] = self.admin.get_url_name(name)
+                if action.default:
+                    urls[default_key] = self.admin.get_url_name(name)
+
+        context.update(dict(admin={'perms': perms, 'urls': urls}))
         return context
 
 
