@@ -29,7 +29,7 @@ class BaseAdmin(object):
     def _bound_actions(self):
         for name, action in self.actions.items():
             if action.view_class is not None:
-                view_kwargs = self.get_view_kwargs(action)
+                view_kwargs = self.get_view_kwargs(name)
                 for attr in view_kwargs:
                     if not hasattr(action.view_class, attr):
                         setattr(action.view_class, attr, None)
@@ -89,7 +89,7 @@ class BaseAdmin(object):
             raise ValueError('%s must have a default action' % type(self))
         if len(actions) > 1:
             raise ValueError('%s must have only one default action' % type(self))
-        return actions[0]
+        return actions[0].name
 
 
     @cached_property
@@ -136,7 +136,7 @@ class ModelAdmin(BaseAdmin):
     def get_table_class(self):
         item_action = self.get_default_action(item=True)
         return table_factory(self.model_class, self.list_display,
-                             action=item_action.url_name)
+                             action=item_action)
 
     def get_form_class(self, request, obj=None, **kwargs):
         return self.form_class
@@ -171,12 +171,15 @@ class ModelAdmin(BaseAdmin):
         return self.permissions.get(action, default_perm)
 
     def has_permission(self, request, action, obj=None, **kwargs):
-        return request.user.has_perm(self.get_permisson(action))
+        perm = self.get_permisson(action)
+        if perm is not None:
+            return request.user.has_perm(perm)
+        return True
 
     def get_menu(self):
         default_action = self.get_default_action()
         return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
-                         reverse(self.get_url_name(default_action.name)),
+                         reverse(self.get_url_name(default_action)),
                          check=lambda r: self.has_permission(r, default_action),
                          parent=self.model_class._meta.app_label,
                          weight=self.menu_weight,
