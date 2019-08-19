@@ -187,4 +187,4 @@ class ModelAdmin(BaseAdmin):
 
     def get_success_url(self, *args, **kwargs):
         action = self.get_default_action()
-        return reverse(self.urls[action.name])
+        return reverse(self.urls[action])
