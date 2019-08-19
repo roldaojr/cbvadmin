@@ -35,7 +35,7 @@ class BaseAdmin(object):
                         setattr(action.view_class, attr, None)
                 view_func = action.view_class.as_view(**view_kwargs)
                 self.bound_actions[name] = BoundAction(
-                    self, name=name, view=view_func,
+                    self, name=name, view=view_func, perm=action.perm,
                     default=action.default, item=action.item, path=action.path)
             else:
                 raise ValueError('view_class for action "%s" is undefined (namespace %s).' % (name, self.namespace))
@@ -164,17 +164,17 @@ class ModelAdmin(BaseAdmin):
             self.model_class._meta.model_name)
 
     def get_permisson(self, action):
-        action_perm = getattr(action, 'perm', action)
-        default_perm = '%s.%s_%s' % (
-            self.model_class._meta.app_label, action_perm,
-            self.model_class._meta.model_name)
-        return self.permissions.get(action, default_perm)
+        action_perm = getattr(self.bound_actions[action], 'perm', None)
+        if action_perm:
+            default_perm = '%s.%s_%s' % (
+                self.model_class._meta.app_label, action_perm,
+                self.model_class._meta.model_name)
+            return self.permissions.get(action, default_perm)
+        return None
 
     def has_permission(self, request, action, obj=None, **kwargs):
         perm = self.get_permisson(action)
-        if perm is not None:
-            return request.user.has_perm(perm)
-        return True
+        return request.user.has_perm(perm) if perm else True
 
     def get_menu(self):
         default_action = self.get_default_action()

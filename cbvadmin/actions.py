@@ -6,6 +6,7 @@ class Action(object):
     default = False
     item = False
     path = None
+    perm = None
 
     def __init__(self, view_class, **kwargs):
         self.view_class = view_class
@@ -21,6 +22,7 @@ class BoundAction(object):
     default = False
     item = False
     path = None
+    perm = None
 
     def __init__(self, admin, **kwargs):
         self.admin = admin
