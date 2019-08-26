@@ -25,10 +25,14 @@ class AccountsAdmin(SimpleAdmin):
         'login': Action(AdminLoginView),
         'logout': Action(AdminLogoutView),
         'password_change': Action(PasswordChange),
-        'password_reset': Action(AdminPasswordResetView),
-        'password_reset_done': Action(AdminPasswordResetDoneView),
-        'password_reset_confirm': Action(AdminPasswordResetConfirmView),
-        'password_reset_complete': Action(AdminPasswordResetCompleteView)
+        'password_reset': Action(
+            AdminPasswordResetView, path='password_reset/'),
+        'password_reset_done': Action(
+            AdminPasswordResetDoneView, path='password_reset/done/'),
+        'password_reset_confirm': Action(
+            AdminPasswordResetConfirmView, path='reset/<uidb64>/<token>'),
+        'password_reset_complete': Action(
+            AdminPasswordResetCompleteView, path='reset/done/')
     }
 
     def get_menu(self):

@@ -68,7 +68,7 @@ class BaseAdmin(object):
             else:
                 action_path = []
             if not action.default:
-                action_path.append(action.name)
+                action_path.append(action.path or action.name)
             urls.append(path('/'.join(action_path), action.view,
                              name=action.name))
 

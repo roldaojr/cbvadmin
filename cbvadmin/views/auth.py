@@ -18,7 +18,7 @@ class AdminLogoutView(AdminTemplateMixin, LogoutView):
 
 
 class AdminPasswordResetView(AdminTemplateMixin, PasswordResetView):
-    email_template_name = 'cbvadmin/semantic-ui/registration/password_reset_email.html'
+    email_template_name = 'cbvadmin/registration/password_reset_email.html'
 
     def get_success_url(self):
         return reverse_lazy(self.admin.urls['password_reset_done'])
