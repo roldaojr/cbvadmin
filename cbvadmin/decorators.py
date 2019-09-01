@@ -1,8 +1,8 @@
 from .sites import site
 
 
-def register(model_class):
-    def decorated(admin_class):
-        site.register(model_class, admin_class)
-        return admin_class
+def register(name):
+    def decorated(obj):
+        site.register(name, obj)
+        return obj
     return decorated
