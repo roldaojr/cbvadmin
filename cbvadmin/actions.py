@@ -1,7 +1,4 @@
-from django.urls import path, reverse
-
-
-class Action(object):
+class Action():
     view_class = None
     default = False
     item = False
@@ -15,7 +12,7 @@ class Action(object):
                 setattr(self, key, value)
 
 
-class BoundAction(object):
+class BoundAction():
     name = None
     admin = None
     view = None

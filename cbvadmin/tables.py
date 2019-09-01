@@ -1,7 +1,8 @@
+# pylint: disable=protected-access
 from django_tables2 import tables, columns
 
 
-def table_factory(model, fields=None, action=None, extra={}):
+def table_factory(model, fields=None, action=None, extra=None):
     attrs = {'Meta': type('Meta', (object,), {
         'model': model, 'fields': fields})}
     if action is not None:
@@ -13,6 +14,6 @@ def table_factory(model, fields=None, action=None, extra={}):
                 linkify=(action, {"pk": tables.Accessor("pk")}))
         })
 
-    attrs.update(extra)
+    attrs.update(extra or {})
     return type('%sTable' % model._meta.object_name,
                 (tables.Table,), attrs)

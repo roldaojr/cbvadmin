@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 from __future__ import unicode_literals
 from django.db import DEFAULT_DB_ALIAS
 from django.apps import apps as global_apps

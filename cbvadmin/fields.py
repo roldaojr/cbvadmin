@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import FieldDoesNotExist
 
@@ -43,7 +44,7 @@ def lookup_field(name, obj, model_admin=None):
     return f, attr, value
 
 
-class ValueField(object):
+class ValueField():
     def __init__(self, obj, field_name, filter_func=None):
         try:
             f, attr, value = lookup_field(field_name, obj)

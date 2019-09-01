@@ -1,19 +1,20 @@
+# pylint: disable=function-redefined
 from django.template.loader import render_to_string
-from crispy_forms.helper import FormHelper
+from crispy_forms.helper import FormHelper  # NOQA
 from crispy_forms.utils import flatatt
-from crispy_forms.layout import *
-from .fields import valuefield_for_formfield, ValueField
+from crispy_forms.layout import *  # NOQA
+from .fields import ValueField  # NOQA
 
 
-class Row(Div):
+class Row(Div):  # NOQA
     css_class = 'row'
 
 
-class Column(Div):
+class Column(Div):  # NOQA
     css_class = 'col'
 
 
-class Button(Button):
+class Button(Button):  # NOQA
     """
     Used to create a Submit input descriptor for the {% crispy %} template tag:
     .. sourcecode:: python
@@ -25,7 +26,7 @@ class Button(Button):
     field_classes = 'btn waves-effect waves-light'
 
 
-class Submit(Submit):
+class Submit(Submit):  # NOQA
     """
     Used to create a Submit button descriptor for the {% crispy %}
     template tag:
@@ -38,15 +39,15 @@ class Submit(Submit):
     field_classes = 'btn waves-effect waves-light'
 
 
-class StrictField(Field):
+class StrictField(Field):  # NOQA
     template = "%s/field.strict.html"
 
 
-class StaticField(Field):
+class StaticField(Field):  # NOQA
     template = "%s/field.static.html"
 
-    def __init__(self, *args, format=None, **kwargs):
-        self.format = format
+    def __init__(self, *args, fmt=None, **kwargs):
+        self.format = fmt
         super().__init__(*args, **kwargs)
 
     def render_static_field(self, field, form, form_style, context, **kwargs):

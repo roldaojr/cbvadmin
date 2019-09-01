@@ -1,5 +1,5 @@
-from copy import copy
-from django.urls import path, reverse, reverse_lazy
+# pylint: disable=protected-access
+from django.urls import path, reverse
 from django.utils.functional import cached_property
 from menu import MenuItem
 from .actions import Action, BoundAction
@@ -8,7 +8,7 @@ from .views.edit import AddView, EditView, DeleteView
 from .views.list import ListView
 
 
-class BaseAdmin(object):
+class BaseAdmin():
     site = None
     namespace = None
     default_action = None
@@ -74,8 +74,8 @@ class BaseAdmin(object):
 
         if self.namespace:
             return urls, self.namespace
-        else:
-            return urls
+
+        return urls
 
     def get_menu(self):
         return []
@@ -85,12 +85,11 @@ class BaseAdmin(object):
             action for action in self.bound_actions.values()
             if action.default and action.item is item
         ]
-        if len(actions) < 1:
+        if not actions:
             raise ValueError('%s must have a default action' % type(self))
         if len(actions) > 1:
             raise ValueError('%s must have only one default action' % type(self))
         return actions[0].name
-
 
     @cached_property
     def urls(self):

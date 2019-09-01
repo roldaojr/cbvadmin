@@ -5,7 +5,7 @@ from django.views.generic import View
 from menu import MenuItem
 
 
-class AdminSite(object):
+class AdminSite():
     namespace = 'cbvadmin'
 
     def __init__(self):

@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 from django.urls import reverse
 from menu import MenuItem
 from .actions import Action
@@ -39,14 +40,7 @@ class AccountsAdmin(SimpleAdmin):
         return None
 
 
-if '' not in site._registry:
+if '' not in site._registry['admin']:
     site.register('', DefaultAdmin)
-if 'accounts' not in site._registry:
+if 'accounts' not in site._registry['admin']:
     site.register('accounts', AccountsAdmin)
-
-
-#if settings.AUTH_USER_MODEL == 'auth.User' and \
-#   getattr(settings, 'CBVADMIN_REGISTER_USER', True):
-#    from django.contrib.auth.models import User, Group
-#    site.register(User, UserAdmin)
-#    site.register(Group, GroupAdmin)
