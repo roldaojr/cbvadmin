@@ -12,16 +12,17 @@ class AdminSite():
         self._registry = defaultdict(dict)
 
     def register(self, name=None, obj=None, obj_type=None):
-        from .options import BaseAdmin
-        if issubclass(obj, BaseAdmin):
-            obj_type = 'admin'
-            obj = obj(name, site=self)
-        elif issubclass(obj, MenuItem):
-            obj_type = 'menu'
-        elif issubclass(obj, View):
-            obj_type = 'view'
         if obj_type is None:
-            raise TypeError('Unsupperted object type %s' % obj)
+            from .options import BaseAdmin
+            if issubclass(obj, BaseAdmin):
+                obj_type = 'admin'
+                obj = obj(name, site=self)
+            elif issubclass(obj, MenuItem):
+                obj_type = 'menu'
+            elif issubclass(obj, View):
+                obj_type = 'view'
+            else:        
+                raise TypeError('Unsupperted object type %s' % obj)
         self._registry[obj_type][name] = obj
 
     def register_menu(self, name, menuitem):
