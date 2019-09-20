@@ -63,12 +63,14 @@ class BaseAdmin():
     def get_urls(self):
         urls = []
         for action in self.bound_actions.values():
-            if action.item:
-                action_path = ['<int:pk>']
+            action_path = []
+            if action.path:
+                action_path.append(action.path)
             else:
-                action_path = []
-            if not action.default:
-                action_path.append(action.path or action.name)
+                if action.item:
+                    action_path.append('<int:pk>')
+                if not action.default:
+                    action_path.append(action.name)
             urls.append(path('/'.join(action_path), action.view,
                              name=action.name))
 
