@@ -1,19 +1,19 @@
-from __future__ import unicode_literals, absolute_import
-from django.apps import AppConfig
-from django.core import checks
-from django.db.models.signals import post_migrate
+from django.apps import AppConfig, apps
 from django.utils.module_loading import autodiscover_modules
-from .sites import site
-from .checks import check_cbvadmin_app
+from .dashboard import wdigets_registry
+from .sites import site as admin_site
+from .utils import get_setting
 
 
 class CBVAdminConfig(AppConfig):
     name = 'cbvadmin'
 
     def ready(self):
-        super(CBVAdminConfig, self).ready()
-        # Add checks
-        checks.register(check_cbvadmin_app, 'cbvadmin')
+        super().ready()
         # Autodiscover cbvadmin modules
-        autodiscover_modules('cbvadmin', register_to=site)
-        autodiscover_modules('admin', register_to=site)
+        if get_setting('LOAD_ADMIN_MODULE', True):
+            autodiscover_modules('admin', register_to=admin_site)
+        autodiscover_modules('cbvadmin', register_to=admin_site)
+        # discover dashboard widgets
+        app_names = [app.name for app in apps.app_configs.values()]
+        wdigets_registry.autodiscover(app_names)

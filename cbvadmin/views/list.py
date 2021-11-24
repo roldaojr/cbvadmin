@@ -1,6 +1,8 @@
-from django.views.generic.list import ListView
+from django.views.generic.list import ListView as BaseListView
 from django_tables2 import SingleTableMixin, RequestConfig
 from .mixins import AdminMixin, FilterMixin, PermissionRequiredMixin
+
+___all__ = ('TableListMixin', 'TableListView', 'ListView')
 
 
 class TableListMixin(PermissionRequiredMixin, AdminMixin, FilterMixin,
@@ -13,7 +15,7 @@ class TableListMixin(PermissionRequiredMixin, AdminMixin, FilterMixin,
         return self.table_class
 
     def get_table(self, **kwargs):
-        table = super(TableListMixin, self).get_table()
+        table = super().get_table()
         paginate = {'page': self.request.GET.get('page'),
                     'per_page': self.paginate_by}
         RequestConfig(self.request, paginate=paginate).configure(table)
@@ -22,18 +24,19 @@ class TableListMixin(PermissionRequiredMixin, AdminMixin, FilterMixin,
     def get_table_data(self):
         if self.filterset:
             return self.filterset.qs
-        else:
-            return self.get_queryset()
+        return self.get_queryset()
 
     def get_template_names(self, *args, **kwargs):
         if 'querystring_key' in self.request.GET:
             return self.get_admin_template('table.html')
-        else:
-            return super(TableListMixin, self).get_template_names(
-                *args, **kwargs)
+        return super().get_template_names(*args, **kwargs)
 
 
-class TableListView(TableListMixin, ListView):
-    pass
+class TableListView(TableListMixin, BaseListView):
+    def get_context_data(self, **kwargs):
+        if self.filterset:
+            kwargs['object_list'] = self.filterset.qs
+        return super().get_context_data(**kwargs)
+
 
 ListView = TableListView

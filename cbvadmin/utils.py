@@ -5,7 +5,7 @@ from menu import MenuItem
 
 
 def get_setting(key, default=None):
-    return getattr(settings, 'CBVADMIN_%s' % key.upper(), default)
+    return getattr(settings, f'CBVADMIN_{key.upper()}', default)
 
 
 def menu_generator(app_label, items):

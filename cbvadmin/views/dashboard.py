@@ -1,19 +1,21 @@
 from django.views.generic import TemplateView
-from django.db.models.base import ModelBase
-from .mixins import AdminTemplateMixin, LoginRequiredMixin
+from cbvadmin.views.mixins import AdminMixin
+from ..dashboard import wdigets_registry
 
 
-class Dashboard(AdminTemplateMixin, LoginRequiredMixin, TemplateView):
-    admin = None
+class DashboardView(AdminMixin, TemplateView):
     template_name = 'dashboard.html'
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(Dashboard, self).get_context_data(*args, **kwargs)
-        counters = []
-        for model_class in self.admin.site._registry.keys():
-            if type(model_class) != str:
-                name = model_class._meta.verbose_name_plural
-                value = model_class.objects.count()
-                counters.append({'name': name, 'value': value})
-        context['counters'] = counters
-        return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        registered_widgets = sorted(
+            wdigets_registry.values(),
+            key=lambda i: i.order
+        )
+        widgets = []
+        for widget_class in registered_widgets:
+            widgets.append(widget_class(self.request))
+
+        return super().get_context_data(
+            widgets=widgets, **context
+        )

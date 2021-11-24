@@ -1,6 +1,5 @@
 # pylint: disable=protected-access
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import FieldDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, FieldDoesNotExist
 
 
 def is_rel_field(name, model):

@@ -1,20 +1,25 @@
 from django.db import models
 from django.urls import reverse
+from django.apps import apps
 from django.contrib.auth.mixins import (
     AccessMixin,
-    LoginRequiredMixin as _LoginRequiredMixin,
-    PermissionRequiredMixin as _PermissionRequiredMixin)
+    LoginRequiredMixin as BaseLoginRequiredMixin,
+    PermissionRequiredMixin as BasePermissionRequiredMixin)
 from django.contrib.messages.views import SuccessMessageMixin
+from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django_filters import CharFilter
 from django_filters.filterset import FilterSet
 from django_filters.views import FilterMixin
 from crispy_forms.helper import FormHelper
+from ..sites import site
 from ..utils import get_setting
 
 
-__all__ = ('AccessMixin', 'LoginRequiredMixin', 'AdminTemplateMixin',
-           'SuccessMixin', 'FormMixin', 'FilterMixin')
+__all__ = (
+    'LoginRequiredMixin', 'AdminTemplateMixin',
+    'SuccessMixin', 'FormMixin', 'FilterMixin', 'AccessMixin'
+)
 
 
 filter_overrides = {
@@ -32,21 +37,17 @@ def filterset_factory(model, fields):
         'model': model, 'fields': fields,
         'filter_overrides': filter_overrides
     })
-    filterset = type(str('%sFilterSet' % model._meta.object_name),
-                     (FilterSet,), {'Meta': meta})
+    model = model._meta.object_name
+    filterset = type(f'{model}FilterSet', (FilterSet,), {'Meta': meta})
     return filterset
 
 
-class AdminAccessMixin(object):
+class LoginRequiredMixin(BaseLoginRequiredMixin):
     def get_login_url(self):
         return reverse('cbvadmin:accounts:login')
 
 
-class LoginRequiredMixin(AdminAccessMixin, _LoginRequiredMixin):
-    pass
-
-
-class PermissionRequiredMixin(AdminAccessMixin, _PermissionRequiredMixin):
+class PermissionRequiredMixin(BasePermissionRequiredMixin):
     def has_permission(self):
         if self.admin:
             try:
@@ -62,39 +63,44 @@ class PermissionRequiredMixin(AdminAccessMixin, _PermissionRequiredMixin):
         return self.request.user.has_perm(perms)
 
 
-class AdminTemplateMixin(object):
-    def get_admin_template(self, name):
-        template_pack = get_setting('TEMPLATE_PACK')
-        return 'cbvadmin/%s/%s' % (template_pack, name)
-
+class AdminTemplateMixin:
     def get_template_names(self, *args, **kwargs):
-        template_names = super(
-            AdminTemplateMixin, self).get_template_names(*args, **kwargs)
-        default_template = getattr(self, 'default_template', None)
-        if default_template:
-            template_names.append(default_template)
-        admin_templates = ['cbvadmin/%s' % t for t in
-                           reversed(template_names)]
-        template_pack = get_setting('TEMPLATE_PACK', '')
-        if template_pack:
-            ui_templates = ['cbvadmin/%s/%s' % (template_pack, t) for t in
-                            reversed(template_names)]
-        else:
-            ui_templates = []
-        return admin_templates + ui_templates
+        template_names = super().get_template_names(*args, **kwargs)
+        template_pack = get_setting('TEMPLATE_PACK', 'adminlte3')
+        return [
+            f'cbvadmin/{template_pack}/{template_name}'
+            for template_name in template_names
+        ]
 
 
 class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
     admin = None
     action = None
 
+    def get_breakcrumbs(self):
+        breakcrumbs = []
+        if hasattr(self, 'model'):
+            app_config = apps.get_app_config(self.model._meta.app_label)
+            breakcrumbs.append(app_config.verbose_name)
+            breakcrumbs.append(self.model._meta.verbose_name_plural.title()) # NOQA
+        elif hasattr(self, 'admin') and hasattr(self.admin, 'namespace'):
+            # pylint: disable=protected-access
+            if self.admin.namespace in site._registry['menu']: 
+                breakcrumbs.append(site._registry['menu'][self.admin.namespace].title)
+            else:
+                breakcrumbs.append(_(self.admin.namespace.title()))
+        if not self.admin.actions[self.action].default or self.admin.actions[self.action].item:
+            breakcrumbs.append(_(self.action.title()))
+            
+        return breakcrumbs
+
     def get_context_data(self, **kwargs):
-        context = super(AdminMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         perms = {}
         urls = {}
         for name, action in self.admin.bound_actions.items():
             perms[name] = self.admin.has_permission(self.request, name)
-            default_key = 'default_object' if action.item else 'default'
+            default_key = 'default_item' if action.item else 'default'
             if action.default:
                 perms[default_key] = perms[name]
 
@@ -103,7 +109,10 @@ class AdminMixin(LoginRequiredMixin, AdminTemplateMixin):
                 if action.default:
                     urls[default_key] = self.admin.get_url_name(name)
 
-        context.update(dict(admin={'perms': perms, 'urls': urls}))
+        context.update({
+            'admin': {'perms': perms, 'urls': urls},
+            'breakcrumbs': self.get_breakcrumbs()
+        })
         return context
 
 
@@ -114,7 +123,8 @@ class SuccessMixin(SuccessMessageMixin):
         if self.success_message:
             return self.success_message.format(
                 name=self.model._meta.verbose_name.title(),
-                obj=self.object)
+                obj=self.object
+            )
 
     def get_success_url(self):
         return self.admin.get_success_url(view=self)
@@ -122,13 +132,16 @@ class SuccessMixin(SuccessMessageMixin):
 
 class FormMixin(SuccessMixin):
     form_id = 'change_form'
+    fields = None
 
     def get_form_class(self):
-        form_class = self.admin.get_form_class(self.request, self.object)
+        form_class = self.form_class
+        if self.admin and hasattr(self.admin, 'get_form_class'):
+            form_class = self.admin.get_form_class(self.request, self.object)
         if form_class is None:
-            if self.form_class is None and self.fields is None:
+            if self.fields is None:
                 self.fields = '__all__'
-            form_class = super(FormMixin, self).get_form_class()
+            form_class = super().get_form_class()
         return form_class
 
     def get_form_helper(self):
@@ -139,7 +152,7 @@ class FormMixin(SuccessMixin):
         return helper
 
     def get_form(self, form_class=None):
-        form = super(FormMixin, self).get_form(form_class)
+        form = super().get_form(form_class)
         if not hasattr(form, 'helper'):
             form.helper = self.get_form_helper()
         return form

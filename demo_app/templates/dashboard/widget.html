@@ -1,0 +1,10 @@
+{% load i18n %}
+<div class="info-box mb-3">
+  <span class="info-box-icon bg-{{ color }} elevation-1">
+    <i class="{{ icon }}"></i>
+  </span>
+  <div class="info-box-content">
+    <span class="info-box-text">{{ title|capfirst }}</span>
+    <span class="info-box-number">{{ value }}</span>
+  </div>
+</div>

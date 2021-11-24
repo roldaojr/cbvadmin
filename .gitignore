@@ -5,6 +5,7 @@ __pycache__
 *.sqlite3
 .coverage
 .pytest*
+.vscode/
 _private/
 media/
 staticfiles/

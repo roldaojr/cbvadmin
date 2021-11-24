@@ -13,7 +13,7 @@ class AdminSite():
 
     def register(self, name=None, obj=None, obj_type=None):
         if obj_type is None:
-            from .options import BaseAdmin
+            from .options import BaseAdmin # NOQA
             if issubclass(obj, BaseAdmin):
                 obj_type = 'admin'
                 obj = obj(name, site=self)

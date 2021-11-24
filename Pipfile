@@ -9,8 +9,18 @@ twine = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-django = "*"
+django = "*"
+django-tables2 = "*"
+django-simple-menu = "*"
+django-filter = "*"
+django-crispy-forms = "*"
+django-dynamic-preferences = "*"
 
 [dev-packages]
+prospector = "*"
+flake8 = "<3.9.0"
+coverage = "*"
+codecov = "*"
 
 [requires]
 python_version = "3"

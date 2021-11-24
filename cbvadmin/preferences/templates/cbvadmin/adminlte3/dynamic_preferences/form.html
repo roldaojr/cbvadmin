@@ -1,0 +1,54 @@
+{% extends 'cbvadmin/adminlte3/base_site.html' %}
+{% load crispy_forms_tags i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ form.media.css }}
+{% endblock %}
+
+{% block title %}{{ view.title }}{% endblock %}
+
+{% block content_body %}
+<section class="content">
+  <div class="container-fluid">
+    {% if form.fields|length > 0 %}
+    <form method="post" id="change-form" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>
+      <div class="card card-{{ appearance.navbar_color }} card-outline card-tabs">
+        {% if registry.section_objects|length > 1 %}
+        <div class="card-header p-0 pt-1 border-bottom-0 d-print-none">
+          <ul class="nav nav-tabs">
+            {% for item in registry.section_objects.values %}
+            <li class="nav-item">
+              <a href="./{{ item.name }}" class="nav-link{% if section.name == item.name %} active{% endif %}">
+                {{ item.verbose_name }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          {% crispy form 'bootstrap4' %}
+        </div>
+        <div class="card-footer text-right">
+          <button type="submit" class="btn btn-success">
+            <i class="fa fa-save"></i>
+            {% trans 'Save' %}
+          </button>
+        </div>
+      </div>
+    </form>
+    {% else %}
+    <div class="alert alert-info alert-dismissible">
+      <h5><i class="icon fas fa-info"></i> {% trans 'No preferences' %}!</h5>
+      {% trans 'Theres no preferences to registered.' %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extrascript %}
+{{ block.super }}
+{{ form.media.js }}
+{% endblock %}

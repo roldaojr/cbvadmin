@@ -2,10 +2,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordResetView, PasswordResetDoneView,
     PasswordResetConfirmView, PasswordResetCompleteView)
-from .mixins import AdminTemplateMixin
+from .mixins import AdminTemplateMixin, FormMixin
 
 
-class AdminLoginView(AdminTemplateMixin, LoginView):
+class AdminLoginView(FormMixin, AdminTemplateMixin, LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
@@ -17,7 +17,7 @@ class AdminLogoutView(AdminTemplateMixin, LogoutView):
     next_page = reverse_lazy('cbvadmin:accounts:login')
 
 
-class AdminPasswordResetView(AdminTemplateMixin, PasswordResetView):
+class AdminPasswordResetView(FormMixin, AdminTemplateMixin, PasswordResetView):
     email_template_name = 'cbvadmin/registration/password_reset_email.html'
 
     def get_success_url(self):

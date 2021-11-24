@@ -1,6 +1,5 @@
 # pylint: disable=protected-access
 from django.urls import path, reverse
-from django.utils.functional import cached_property
 from menu import MenuItem
 from .actions import Action, BoundAction
 from .tables import table_factory
@@ -8,11 +7,9 @@ from .views.edit import AddView, EditView, DeleteView
 from .views.list import ListView
 
 
-class BaseAdmin():
+class BaseAdmin:
     site = None
     namespace = None
-    default_action = None
-    default_object_action = None
     permissions = {}
     menu_weight = 50
     menu_icon = None
@@ -38,18 +35,21 @@ class BaseAdmin():
                     self, name=name, view=view_func, perm=action.perm,
                     default=action.default, item=action.item, path=action.path)
             else:
-                raise ValueError('view_class for action "%s" is undefined (namespace %s).' % (name, self.namespace))
+                raise ValueError(
+                    f'view_class for action "{name}" is undefined'
+                    '(namespace {self.namespace}).'
+                )
 
     def get_view_kwargs(self, action):
         return {'action': action, 'admin': self}
 
     def get_path_prefix(self):
-        return '%s/' % self.namespace if self.namespace else ''
+        return f'{self.namespace}/' if self.namespace else ''
 
     def get_permisson(self, action, **kwargs):
         return self.permissions.get(action, None)
 
-    def has_permission(self, request, action):
+    def has_permission(self, *args, **kwargs):
         return True
 
     def get_url_name(self, action=None):
@@ -88,12 +88,12 @@ class BaseAdmin():
             if action.default and action.item is item
         ]
         if not actions:
-            raise ValueError('%s must have a default action' % type(self))
+            raise ValueError(f'{type(self)} must have a default action')
         if len(actions) > 1:
-            raise ValueError('%s must have only one default action' % type(self))
+            raise ValueError(f'{type(self)} must have only one default action')
         return actions[0].name
 
-    @cached_property
+    @property
     def urls(self):
         admin_urls = {}
         for name, action in self.bound_actions.items():
@@ -105,16 +105,21 @@ class BaseAdmin():
                     admin_urls['default'] = self.get_url_name(action.name)
         return admin_urls
 
+    @property
+    def default_action(self):
+        return filter(lambda a: a.default, self.actions.values())
+
+    @property
+    def default_item_action(self):
+        return filter(lambda a: a.default and a.item, self.actions.values())
+
 
 class SimpleAdmin(BaseAdmin):
     pass
 
 
 class ModelAdmin(BaseAdmin):
-    default_action = 'list'
-    default_object_action = 'change'
     model_class = None
-    view_classes = {}
     # list related options
     list_display = None
     list_display_links = None
@@ -124,14 +129,15 @@ class ModelAdmin(BaseAdmin):
     # menu item optionns
     menu_weight = 50
     menu_icon = None
+
     basic_actions = ['list', 'add', 'change', 'delete']
 
     def __init__(self, model_class, *args, **kwargs):
         self.model_class = model_class
         self.model_opts = model_class._meta
-        namespace = '%s_%s' % (
-            self.model_class._meta.app_label,
-            self.model_class._meta.model_name)
+        app_label = self.model_class._meta.app_label
+        model_name = self.model_class._meta.model_name
+        namespace = f'{app_label}_{model_name}'
         super().__init__(namespace, *args, **kwargs)
 
     def get_table_class(self):
@@ -160,16 +166,16 @@ class ModelAdmin(BaseAdmin):
         super()._bound_actions()
 
     def get_path_prefix(self):
-        return '%s/%s/' % (
-            self.model_class._meta.app_label,
-            self.model_class._meta.model_name)
+        app_label = self.model_class._meta.app_label
+        model_name = self.model_class._meta.model_name
+        return f'{app_label}/{model_name}/'
 
     def get_permisson(self, action):
         action_perm = getattr(self.bound_actions[action], 'perm', None)
         if action_perm:
-            default_perm = '%s.%s_%s' % (
-                self.model_class._meta.app_label, action_perm,
-                self.model_class._meta.model_name)
+            app_label = self.model_class._meta.app_label
+            model_name = self.model_class._meta.model_name
+            default_perm = f'{app_label}.{action_perm}_{model_name}'
             return self.permissions.get(action, default_perm)
         return None
 
@@ -179,12 +185,17 @@ class ModelAdmin(BaseAdmin):
 
     def get_menu(self):
         default_action = self.get_default_action()
-        return [MenuItem(self.model_class._meta.verbose_name_plural.title(),
-                         reverse(self.get_url_name(default_action)),
-                         check=lambda r: self.has_permission(r, default_action),
-                         parent=self.model_class._meta.app_label,
-                         weight=self.menu_weight,
-                         icon=self.menu_icon)]
+        parent = getattr(self, 'parent_menu', self.model_class._meta.app_label)
+        return [
+            MenuItem(
+                self.model_class._meta.verbose_name_plural.title(),
+                reverse(self.get_url_name(default_action)),
+                check=lambda r: self.has_permission(r, default_action),
+                parent=parent,
+                weight=self.menu_weight,
+                icon=self.menu_icon
+            )
+        ]
 
     def get_success_url(self, *args, **kwargs):
         action = self.get_default_action()

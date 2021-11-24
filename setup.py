@@ -10,11 +10,7 @@ setup(
     classifiers=[
         "Environment :: Web Environment",
         "Framework :: Django",
-        "Operating System :: OS Independent",
         "Programming Language :: JavaScript",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -30,10 +26,10 @@ setup(
     zip_safe=False,
     python_requires='>=3',
     install_requires=[
-        'django>=2.2',
-        'django-crispy-forms>=1.6',
-        'django-filter>=2.0',
+        'django>=3.0',
+        'django-crispy-forms>=1.10',
+        'django-filter>=20.0',
         'django-simple-menu>=1.2',
-        'django-tables2>=2.0'
+        'django-tables2>=2.4'
     ]
 )
